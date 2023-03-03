@@ -9,17 +9,17 @@ CONFIG += c++17
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    circle.cpp \
+    backend/src/circle.cpp \
+    backend/src/point.cpp \
+    backend/src/vector.cpp \
     main.cpp \
-    mainwindow.cpp \
-    point.cpp \
-    vector.cpp
+    mainwindow.cpp
 
 HEADERS += \
-    circle.h \
-    mainwindow.h \
-    point.h \
-    vector.h
+    backend/inc/circle.h \
+    backend/inc/point.h \
+    backend/inc/vector.h \
+    mainwindow.h
 
 FORMS += \
     mainwindow.ui
