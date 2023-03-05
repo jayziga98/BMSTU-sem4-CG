@@ -15,6 +15,10 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+private slots:
+    void on_radioButtonPoint_clicked();
+    void on_radioButtonCircle_clicked();
+
 private:
     Ui::MainWindow *ui;
 };

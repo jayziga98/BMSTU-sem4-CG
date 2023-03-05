@@ -16,18 +16,65 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout_8">
     <item row="0" column="0">
-     <layout class="QGridLayout" name="gridLayout_7" rowminimumheight="0" columnminimumwidth="300,800">
+     <layout class="QGridLayout" name="gridLayout_7" columnstretch="0,0" columnminimumwidth="300,800">
       <property name="sizeConstraint">
        <enum>QLayout::SetMinimumSize</enum>
       </property>
-      <item row="0" column="0">
-       <layout class="QVBoxLayout" name="verticalLayout">
+      <item row="2" column="1">
+       <widget class="graphicsView" name="graphicsview">
+        <property name="foregroundBrush">
+         <brush brushstyle="NoBrush">
+          <color alpha="255">
+           <red>0</red>
+           <green>0</green>
+           <blue>0</blue>
+          </color>
+         </brush>
+        </property>
+        <property name="renderHints">
+         <set>QPainter::Antialiasing|QPainter::TextAntialiasing</set>
+        </property>
+        <property name="dragMode">
+         <enum>QGraphicsView::NoDrag</enum>
+        </property>
+        <property name="transformationAnchor">
+         <enum>QGraphicsView::AnchorViewCenter</enum>
+        </property>
+        <property name="resizeAnchor">
+         <enum>QGraphicsView::AnchorViewCenter</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0,0,0">
         <property name="sizeConstraint">
          <enum>QLayout::SetDefaultConstraint</enum>
         </property>
         <property name="rightMargin">
          <number>0</number>
         </property>
+        <item>
+         <widget class="QPushButton" name="pushButton">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>32</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>Построить линию по условию</string>
+          </property>
+          <property name="autoDefault">
+           <bool>false</bool>
+          </property>
+          <property name="default">
+           <bool>true</bool>
+          </property>
+          <property name="flat">
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
         <item>
          <widget class="QGroupBox" name="groupBox">
           <property name="title">
@@ -43,45 +90,52 @@
            <bool>false</bool>
           </property>
           <layout class="QGridLayout" name="gridLayout_2">
-           <item row="0" column="0">
+           <item row="3" column="0">
+            <widget class="QPushButton" name="pushButtonAddCircle">
+             <property name="text">
+              <string>Добавить</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="0">
             <layout class="QGridLayout" name="gridLayout">
              <item row="1" column="0">
               <layout class="QHBoxLayout" name="horizontalLayout_2">
                <item>
-                <widget class="QLabel" name="label">
+                <widget class="QLabel" name="labelCircleX">
                  <property name="text">
                   <string>X</string>
                  </property>
                 </widget>
                </item>
                <item>
-                <widget class="QLineEdit" name="lineEdit"/>
+                <widget class="QLineEdit" name="lineEditCircleX"/>
                </item>
                <item>
                 <layout class="QHBoxLayout" name="horizontalLayout">
                  <item>
-                  <widget class="QLabel" name="label_2">
+                  <widget class="QLabel" name="labelCircleY">
                    <property name="text">
                     <string>Y</string>
                    </property>
                   </widget>
                  </item>
                  <item>
-                  <widget class="QLineEdit" name="lineEdit_2"/>
+                  <widget class="QLineEdit" name="lineEditCircleY"/>
                  </item>
                 </layout>
                </item>
               </layout>
              </item>
              <item row="0" column="0">
-              <widget class="QLabel" name="label_3">
+              <widget class="QLabel" name="labelCircleCenter">
                <property name="text">
                 <string>Центр</string>
                </property>
               </widget>
              </item>
              <item row="3" column="0">
-              <widget class="QLabel" name="label_4">
+              <widget class="QLabel" name="labelCircleRadius">
                <property name="text">
                 <string>Радиус</string>
                </property>
@@ -90,14 +144,14 @@
              <item row="4" column="0">
               <layout class="QHBoxLayout" name="horizontalLayout_3">
                <item>
-                <widget class="QLabel" name="label_5">
+                <widget class="QLabel" name="labelCircleRadius_2">
                  <property name="text">
                   <string>R</string>
                  </property>
                 </widget>
                </item>
                <item>
-                <widget class="QLineEdit" name="lineEdit_3"/>
+                <widget class="QLineEdit" name="lineEditCircleRadius"/>
                </item>
               </layout>
              </item>
@@ -120,61 +174,100 @@
           <property name="checkable">
            <bool>false</bool>
           </property>
-          <layout class="QGridLayout" name="gridLayout_3">
+          <layout class="QGridLayout" name="gridLayout_3" rowminimumheight="0,0" columnminimumwidth="0">
            <item row="0" column="0">
             <layout class="QGridLayout" name="gridLayout_4">
+             <item row="0" column="0">
+              <widget class="QLabel" name="labelPointCoords">
+               <property name="text">
+                <string>Координаты</string>
+               </property>
+              </widget>
+             </item>
              <item row="1" column="0">
               <layout class="QHBoxLayout" name="horizontalLayout_4">
                <item>
-                <widget class="QLabel" name="label_6">
+                <widget class="QLabel" name="labelPointX">
                  <property name="text">
                   <string>X</string>
                  </property>
                 </widget>
                </item>
                <item>
-                <widget class="QLineEdit" name="lineEdit_4"/>
+                <widget class="QLineEdit" name="lineEditPointX"/>
                </item>
                <item>
                 <layout class="QHBoxLayout" name="horizontalLayout_5">
                  <item>
-                  <widget class="QLabel" name="label_7">
+                  <widget class="QLabel" name="labelPointY">
                    <property name="text">
                     <string>Y</string>
                    </property>
                   </widget>
                  </item>
                  <item>
-                  <widget class="QLineEdit" name="lineEdit_5"/>
+                  <widget class="QLineEdit" name="lineEditPointY"/>
                  </item>
                 </layout>
                </item>
               </layout>
              </item>
-             <item row="0" column="0">
-              <widget class="QLabel" name="label_8">
-               <property name="text">
-                <string>Координаты</string>
-               </property>
-              </widget>
-             </item>
             </layout>
+           </item>
+           <item row="1" column="0">
+            <widget class="QPushButton" name="PushButton">
+             <property name="text">
+              <string>Добавить</string>
+             </property>
+            </widget>
            </item>
           </layout>
          </widget>
         </item>
         <item>
-         <widget class="QTabWidget" name="tabWidget">
-          <property name="currentIndex">
-           <number>0</number>
+         <widget class="QGroupBox" name="groupBox_3">
+          <property name="title">
+           <string>Выбор объекта для рисования</string>
           </property>
-          <widget class="QWidget" name="tab">
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+          <layout class="QGridLayout" name="gridLayout_9">
+           <item row="0" column="0">
+            <widget class="QRadioButton" name="radioButtonPoint">
+             <property name="text">
+              <string>Точка</string>
+             </property>
+             <property name="checkable">
+              <bool>true</bool>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QRadioButton" name="radioButtonCircle">
+             <property name="text">
+              <string>Окружность</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <widget class="QTabWidget" name="tabObjects">
+          <property name="currentIndex">
+           <number>1</number>
+          </property>
+          <widget class="QWidget" name="tabCircles">
            <attribute name="title">
             <string>Окружности</string>
            </attribute>
            <layout class="QGridLayout" name="gridLayout_5">
             <item row="0" column="0">
-             <widget class="QScrollArea" name="scrollArea">
+             <widget class="QScrollArea" name="scrollAreaCircles">
               <property name="frameShape">
                <enum>QFrame::StyledPanel</enum>
               </property>
@@ -196,12 +289,25 @@
                  <x>0</x>
                  <y>0</y>
                  <width>250</width>
-                 <height>346</height>
+                 <height>180</height>
                 </rect>
                </property>
                <layout class="QVBoxLayout" name="verticalLayout_2">
                 <item>
-                 <widget class="QTableWidget" name="tableWidget"/>
+                 <widget class="QTableWidget" name="tabCirclesContent">
+                  <property name="rowCount">
+                   <number>0</number>
+                  </property>
+                  <property name="columnCount">
+                   <number>0</number>
+                  </property>
+                  <attribute name="horizontalHeaderVisible">
+                   <bool>true</bool>
+                  </attribute>
+                  <attribute name="horizontalHeaderCascadingSectionResizes">
+                   <bool>false</bool>
+                  </attribute>
+                 </widget>
                 </item>
                </layout>
               </widget>
@@ -209,13 +315,13 @@
             </item>
            </layout>
           </widget>
-          <widget class="QWidget" name="tab_2">
+          <widget class="QWidget" name="tabPoints">
            <attribute name="title">
             <string>Точки</string>
            </attribute>
            <layout class="QGridLayout" name="gridLayout_6">
             <item row="0" column="0">
-             <widget class="QScrollArea" name="scrollArea_2">
+             <widget class="QScrollArea" name="scrollAreaPoints">
               <property name="widgetResizable">
                <bool>true</bool>
               </property>
@@ -225,12 +331,12 @@
                  <x>0</x>
                  <y>0</y>
                  <width>250</width>
-                 <height>346</height>
+                 <height>180</height>
                 </rect>
                </property>
                <layout class="QVBoxLayout" name="verticalLayout_3">
                 <item>
-                 <widget class="QTableWidget" name="tableWidget_2"/>
+                 <widget class="QTableWidget" name="tabPointsContent"/>
                 </item>
                </layout>
               </widget>
@@ -241,13 +347,6 @@
          </widget>
         </item>
        </layout>
-      </item>
-      <item row="0" column="1">
-       <widget class="QGraphicsView" name="graphicsView">
-        <property name="dragMode">
-         <enum>QGraphicsView::ScrollHandDrag</enum>
-        </property>
-       </widget>
       </item>
      </layout>
     </item>
@@ -265,6 +364,13 @@
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>graphicsView</class>
+   <extends>QGraphicsView</extends>
+   <header>graphicsview.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
