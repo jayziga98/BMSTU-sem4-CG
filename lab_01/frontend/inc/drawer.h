@@ -4,6 +4,7 @@
 #include <QGraphicsScene>
 #include "point.h"
 #include "circle.h"
+#include "vector.h"
 
 #define POINT_RADIUS 8
 
@@ -24,5 +25,6 @@ void init(QGraphicsScene *scene, drawer_t &drawer, Qt::GlobalColor outline, Qt::
 void setupItem(QGraphicsEllipseItem *item);
 void draw_point(const drawer_t &scene, const point_t &p);
 void draw_circle(const drawer_t &scene, const circle_t &c);
+QGraphicsLineItem *draw_line(const drawer_t &scene, const vector_t &v1, const vector_t &v2, QString tooltipAdditional);
 
 #endif // DRAWER_H

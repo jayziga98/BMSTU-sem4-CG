@@ -19,6 +19,8 @@ private slots:
     void on_radioButtonPoint_clicked();
     void on_radioButtonCircle_clicked();
 
+    void on_pushButtonLine_clicked();
+
 private:
     Ui::MainWindow *ui;
 };

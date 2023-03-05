@@ -15,6 +15,19 @@ graphicsView::graphicsView(QWidget *parent) : QGraphicsView(parent)
     this->setAlignment(Qt::AlignTop | Qt::AlignLeft);
     this->setStyleSheet("QGraphicsView {background-color: white}");
     this->setMouseTracking(true);
+
+    this->linesGroup = nullptr;
+}
+
+QGraphicsItemGroup *graphicsView::removeItems(QGraphicsItemGroup *group)
+{
+    if (group != nullptr)
+    {
+        qDeleteAll(group->childItems());
+
+        this->scene()->destroyItemGroup(group);
+    }
+    return nullptr;
 }
 
 void graphicsView::setupScene()
@@ -25,6 +38,8 @@ void graphicsView::setupScene()
 
 void graphicsView::mousePressEvent(QMouseEvent *event)
 {
+    this->linesGroup = this->removeItems(this->linesGroup);
+
     if(event->modifiers().testFlag(Qt::ShiftModifier)) {
         setDragMode(QGraphicsView::ScrollHandDrag);
         qDebug() << "setting dragging mode";
@@ -76,8 +91,6 @@ void graphicsView::mouseMoveEvent(QMouseEvent *event)
             vector_t vrad;
             init(vrad, basePoint.x(), basePoint.y(), pos.x(), pos.y());
             double rad = length(vrad) + startDrawing->boundingRect().width() / 4;
-            qDebug() << "Base: " << basePoint << " Cur: " << pos;
-            //qDebug() << basePoint << pos << event->pos() << rad << item->boundingRect().width() / 2;
             QGraphicsEllipseItem *castedItem = qgraphicsitem_cast<QGraphicsEllipseItem *>(startDrawing);
             castedItem->setRect(basePoint.x() - rad, basePoint.y() - rad, rad * 2, rad * 2);
         }
@@ -93,6 +106,8 @@ void graphicsView::mouseMoveEvent(QMouseEvent *event)
 
 void graphicsView::mouseReleaseEvent(QMouseEvent *event)
 {
+    this->linesGroup = this->removeItems(this->linesGroup);
+
     this->setCursor(Qt::ArrowCursor);
     startDrawing = 0;
 
@@ -114,6 +129,22 @@ void graphicsView::mouseReleaseEvent(QMouseEvent *event)
     }
 
     QGraphicsView::mouseReleaseEvent(event);
+}
+
+QGraphicsItemGroup *graphicsView::getlinesGroup()
+{
+    return this->linesGroup;
+}
+
+void graphicsView::createlinesGroup()
+{
+    this->linesGroup = new QGraphicsItemGroup();
+    this->scene()->addItem(this->linesGroup);
+}
+
+void graphicsView::addlinesGroup(QGraphicsItem *item)
+{
+    this->linesGroup->addToGroup(item);
 }
 
 void graphicsView::setToDraw(DrawerItem newToDraw){

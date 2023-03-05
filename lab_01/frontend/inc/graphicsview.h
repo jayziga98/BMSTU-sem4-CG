@@ -18,6 +18,9 @@ public:
     void setupScene();
     void setToDraw(DrawerItem);
     DrawerItem ToDraw();
+    QGraphicsItemGroup *getlinesGroup();
+    void createlinesGroup();
+    void addlinesGroup(QGraphicsItem *item);
 
 public slots:
     void mousePressEvent(QMouseEvent *event);
@@ -26,6 +29,8 @@ public slots:
 private:
     QPointF basePoint;
     QGraphicsItem *startDrawing;
+    QGraphicsItemGroup *linesGroup;
+    QGraphicsItemGroup *removeItems(QGraphicsItemGroup *group);
 };
 
 #endif // GRAPHICSVIEW_H
