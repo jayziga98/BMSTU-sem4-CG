@@ -273,7 +273,7 @@
                     <x>0</x>
                     <y>0</y>
                     <width>226</width>
-                    <height>172</height>
+                    <height>174</height>
                    </rect>
                   </property>
                   <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -315,7 +315,7 @@
                     <x>0</x>
                     <y>0</y>
                     <width>226</width>
-                    <height>172</height>
+                    <height>174</height>
                    </rect>
                   </property>
                   <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -376,7 +376,7 @@
      <x>0</x>
      <y>0</y>
      <width>1136</width>
-     <height>24</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuEdit">
@@ -397,8 +397,6 @@
     <property name="title">
      <string>Действия</string>
     </property>
-    <addaction name="actionAddCircle"/>
-    <addaction name="actionAddPoint"/>
     <addaction name="separator"/>
     <addaction name="actionExec"/>
     <addaction name="separator"/>
@@ -410,7 +408,6 @@
     </property>
     <addaction name="actionAboutProgram"/>
     <addaction name="separator"/>
-    <addaction name="actionAboutTeacher"/>
     <addaction name="actionAboutAuthor"/>
    </widget>
    <addaction name="menuEdit"/>

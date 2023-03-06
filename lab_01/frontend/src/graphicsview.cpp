@@ -81,8 +81,8 @@ void graphicsView::drawAxis()
         this->scene()->removeItem(this->axisX);
     if (this->axisY)
         this->scene()->removeItem(this->axisY);
-    this->axisX = this->scene()->addLine(QLineF(-sceneBounds.width(), 0, sceneBounds.width(), 0), QPen(Qt::gray, 4, Qt::DashLine));
-    this->axisY = this->scene()->addLine(QLineF(0, sceneBounds.height(), 0, -sceneBounds.height()), QPen(Qt::gray, 4, Qt::DashLine));
+    this->axisX = this->scene()->addLine(QLineF(0/*-sceneBounds.width()*/, 0, sceneBounds.width(), 0), QPen(Qt::gray, 4, Qt::DashLine));
+    this->axisY = this->scene()->addLine(QLineF(0, 0/*sceneBounds.height()*/, 0, -sceneBounds.height()), QPen(Qt::gray, 4, Qt::DashLine));
     this->fitAll();
 }
 
@@ -106,7 +106,10 @@ void graphicsView::mousePressEvent(QMouseEvent *event)
         event->buttons().setFlag(Qt::LeftButton);
     }
     else if (event->buttons().testFlag(Qt::RightButton))
-        remove_item(drawer, item);
+            remove_item(drawer, item);
+
+    if (item != nullptr)
+        item->setSelected(true);
 
     QGraphicsView::mousePressEvent(event);
 }
@@ -116,11 +119,10 @@ void graphicsView::mouseMoveEvent(QMouseEvent *event)
     this->setupScene();
     QPointF pos = mapToScene(event->pos());
 
-    drawAxis();
-
     QGraphicsItem *item = this->scene()->itemAt(pos, QTransform());
 
     resize_circle(startDrawing, basePoint, pos);
+    this->fitAll();
 
     if (item != nullptr)
     {
@@ -135,8 +137,6 @@ void graphicsView::mouseMoveEvent(QMouseEvent *event)
 
 void graphicsView::mouseReleaseEvent(QMouseEvent *event)
 {
-    this->fitAll();
-
     this->linesGroup = this->removeItems(this->linesGroup);
 
     this->setCursor(Qt::ArrowCursor);
@@ -148,6 +148,7 @@ void graphicsView::mouseReleaseEvent(QMouseEvent *event)
     QGraphicsItem *item = this->scene()->itemAt(pos, QTransform());
     update_tooltip(item, pos);
 
+    this->fitAll();
     QGraphicsView::mouseReleaseEvent(event);
 }
 

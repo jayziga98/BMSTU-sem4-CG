@@ -41,6 +41,8 @@ private slots:
     void on_pushButtonAddCircle_clicked();
     void on_PushButtonAddPoint_clicked();
 
+    void on_actionAboutAuthor_triggered();
+
 private:
     Ui::MainWindow *ui;
 };
