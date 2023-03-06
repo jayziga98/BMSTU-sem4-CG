@@ -300,76 +300,12 @@ void MainWindow::on_pushButtonLine_clicked()
 
     if (lineExist)
     {
-        //double k = fit(c, p1, p2);
         ui->graphicsview->setupScene();
         drawer_t drawer;
         init(ui->graphicsview->scene(), drawer, Qt::red, Qt::red);
         QGraphicsLineItem *line = draw_line(drawer, p1, p2, QString(" [left: %1").arg(leftFinal) + QString("|%1 :right]").arg(rightFinal));
         ui->graphicsview->addlinesGroup(line);
     }
-//    for (auto circle: selectedCircles.keys())
-//    {
-//        qsizetype diff = selectedCircles[circle].size();
-//        int leftFinal = 0;
-//        int rightFinal = 0;
-//        vector_t p1;
-//        vector_t p2;
-//        bool lineExist = false;
-//        auto content = selectedCircles[circle];
-//        for (auto pointInCirclei = content.begin(); pointInCirclei != content.end(); pointInCirclei++)
-//            for (auto pointInCirclej = pointInCirclei + 1; pointInCirclej != content.end(); pointInCirclej++)
-//            {
-//                vector_t pi;
-//                QRectF pointBoundsi = (*pointInCirclei)->boundingRect();
-//                init(pi, pointBoundsi.x() + POINT_RADIUS / 2, pointBoundsi.y() + POINT_RADIUS / 2);
-
-//                vector_t pj;
-//                QRectF pointBoundsj = (*pointInCirclej)->boundingRect();
-//                init(pj, pointBoundsj.x() + POINT_RADIUS / 2, pointBoundsj.y() + POINT_RADIUS / 2);
-
-//                int left = 0, right = 0;
-//                for (auto point: content)
-//                {
-//                    if (point == *pointInCirclej || point == *pointInCirclei)
-//                        continue;
-
-//                    point_t p;
-//                    QRectF pointBounds = point->boundingRect();
-//                    init(p, pointBounds.x() + POINT_RADIUS, pointBounds.y() + POINT_RADIUS);
-//                    int d = direction(pi, pj, p);
-
-//                    if (d > 0)
-//                        left++;
-//                    else if (d < 0)
-//                        right++;
-//                }
-
-//                if (abs(right - left) < diff)
-//                {
-//                    diff = abs(right - left);
-//                    p1 = pi;
-//                    p2 = pj;
-//                    leftFinal = left;
-//                    rightFinal = right;
-//                    lineExist = true;
-//                }
-//            }
-
-//        circle_t c;
-//        QRectF circleBounds = circle->boundingRect();
-//        double rad = circleBounds.width() / 2;
-//        init(c, circleBounds.x() + rad, circleBounds.y() + rad, rad);
-
-//        if (lineExist)
-//        {
-//            //double k = fit(c, p1, p2);
-//            ui->graphicsview->setupScene();
-//            drawer_t drawer;
-//            init(ui->graphicsview->scene(), drawer, Qt::red, Qt::red);
-//            QGraphicsLineItem *line = draw_line(drawer, p1, p2, QString(" [left: %1").arg(leftFinal) + QString("|%1 :right]").arg(rightFinal));
-//            ui->graphicsview->addlinesGroup(line);
-//        }
-//    }
 }
 
 void MainWindow::on_actionAboutAuthor_triggered()
