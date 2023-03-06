@@ -1,9 +1,13 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+#include <qmessagebox.h>
+#include <qmovie.h>
 #include <qwidget.h>
 #include "drawer.h"
 #include "vector.h"
+#include <QResource>
+#include <QDirIterator>
 
 MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWindow)
 {
@@ -26,6 +30,171 @@ void MainWindow::on_radioButtonCircle_clicked()
     ui->graphicsview->setToDraw(CIRCLE);
 }
 
+void MainWindow::on_actionAboutProgram_triggered()
+{
+    QMessageBox msgBox;
+    msgBox.setText("Компьютетная графика\nЛабоаторная работа №1");
+    msgBox.setInformativeText("Вариант №12\n"
+                              "На плоскости заданы множество точек М и круг. Выбрать из М две\n"
+                              "различные точки так, чтобы наименьшим образом различались количества точек в\n"
+                              "круге, лежащие по разные стороны от прямой, проходящей через эти точки.</p>");
+    msgBox.setStandardButtons(QMessageBox::Ok);
+    msgBox.setDefaultButton(QMessageBox::Ok);
+    msgBox.exec();
+}
+
+void MainWindow::warningMessage(QString title, QString text)
+{
+    QMovie *mov = new QMovie(":/headslap.gif");
+
+    QMessageBox msgBox = QMessageBox();
+    msgBox.setWindowTitle(title);
+    msgBox.setWindowIcon(QIcon(QPixmap(":/headslap.gif")));
+    msgBox.setText(text);
+    msgBox.addButton(QString("Закрыть"), QMessageBox::AcceptRole);
+
+    QLabel *label = new QLabel(&msgBox);
+    label->setMovie(mov);
+    mov->start();
+
+    msgBox.exec();
+}
+
+void MainWindow::infoMessage(QString title, QString text)
+{
+    QMessageBox msgBox;
+    msgBox.setIcon(QMessageBox::Information);
+    msgBox.setWindowTitle(title);
+    msgBox.setText(text);
+    msgBox.addButton(QString("Закрыть"), QMessageBox::AcceptRole);
+
+    msgBox.exec();
+}
+
+int MainWindow::askMessage(QString title, QString text)
+{
+    QMessageBox msgBox;
+    msgBox.setIcon(QMessageBox::Question);
+    msgBox.setWindowTitle(title);
+    msgBox.setText(text);
+    msgBox.addButton(QString("Нет"), QMessageBox::RejectRole);
+    msgBox.addButton(QString("Да"), QMessageBox::AcceptRole);
+
+    return msgBox.exec();
+}
+
+void MainWindow::closeEvent(QCloseEvent* event)
+{
+    event->ignore();
+    if (askMessage("Завершение работы", "Вы уверены что хотите выйти?"))
+        event->ignore();
+    else
+        event->accept();
+}
+
+void MainWindow::on_actionSideMenu_changed()
+{
+    ui->widgetSideMenu->setVisible(!ui->widgetSideMenu->isVisible());
+}
+
+void MainWindow::on_actionClear_triggered()
+{
+    ui->graphicsview->clearScene();
+}
+
+void MainWindow::on_actionExec_triggered()
+{
+    MainWindow::on_pushButtonLine_clicked();
+}
+
+circle_t MainWindow::getlineEditCircleData(bool *ok)
+{
+    circle_t c;
+
+    QString xText = ui->lineEditCircleX->text();
+    double x = xText.toDouble(ok);
+
+    if (ok && !(*ok))
+    {
+        warningMessage("Ошибка! Некорректный ввод!", "Координата X должна быть вещественным числом!\nПримеры: 1.23, -1.23, 1");
+        return c;
+    }
+
+    QString yText = ui->lineEditCircleY->text();
+    double y = yText.toDouble(ok);
+
+    if (ok && !(*ok))
+    {
+        warningMessage("Ошибка! Некорректный ввод!", "Координата Y должна быть вещественным числом!\nПримеры: 1.23, -1.23, 1");
+        return c;
+    }
+
+    QString rText = ui->lineEditCircleRadius->text();
+    double r = rText.toDouble(ok);
+
+    if (ok && !(*ok))
+    {
+        warningMessage("Ошибка! Некорректный ввод!", "Радиус R должен быть вещественным числом!\nПримеры: 1.23, -1.23, 1");
+        return c;
+    }
+
+    init(c, x, y, r);
+
+    return c;
+}
+
+point_t MainWindow::getlineEditPointData(bool *ok)
+{
+    point_t p;
+
+    QString xText = ui->lineEditPointX->text();
+    double x = xText.toDouble(ok);
+
+    if (ok && !(*ok))
+    {
+        warningMessage("Ошибка! Некорректный ввод!", "Координата X должна быть вещественным числом!\nПримеры: 1.23, -1.23, 1");
+        return p;
+    }
+
+    QString yText = ui->lineEditPointY->text();
+    double y = yText.toDouble(ok);
+
+    if (ok && !(*ok))
+    {
+        warningMessage("Ошибка! Некорректный ввод!", "Координата Y должна быть вещественным числом!\nПримеры: 1.23, -1.23, 1");
+        return p;
+    }
+
+    init(p, x, y);
+
+    return p;
+}
+
+void MainWindow::on_pushButtonAddCircle_clicked()
+{
+    bool ok = 1;
+    circle_t c = getlineEditCircleData(&ok);
+    if (!ok)
+        return;
+
+    drawer_t drawer;
+    init(ui->graphicsview->scene(), drawer, Qt::black, Qt::black);
+
+    draw_circle(drawer, c);
+}
+
+void MainWindow::on_PushButtonAddPoint_clicked()
+{
+    bool ok = 1;
+    point_t p = getlineEditPointData(&ok);
+    if (!ok)
+        return;
+
+    drawer_t drawer;
+    init(ui->graphicsview->scene(), drawer, Qt::black, Qt::black);
+
+    draw_point(drawer, p);
+}
 
 void MainWindow::on_pushButtonLine_clicked()
 {
@@ -36,7 +205,10 @@ void MainWindow::on_pushButtonLine_clicked()
             selectedCircles[item] = QList<QGraphicsItem*> ();
 
     if (selectedCircles.empty())
+    {
+        infoMessage("Необходимо выделить окружности!", "Чтобы построить линию требуется выделить окружности с помощью CMD+ЛКМ");
         return;
+    }
 
     if (ui->graphicsview->getlinesGroup() == nullptr)
         ui->graphicsview->createlinesGroup();
@@ -61,16 +233,17 @@ void MainWindow::on_pushButtonLine_clicked()
         }
     }
 
-    for (const auto &circle: qAsConst(selectedCircles))
+    for (auto circle: selectedCircles.keys())
     {
-        qsizetype diff = circle.size();
+        qsizetype diff = selectedCircles[circle].size();
         int leftFinal = 0;
         int rightFinal = 0;
         vector_t p1;
         vector_t p2;
         bool lineExist = false;
-        for (auto pointInCirclei = circle.begin(); pointInCirclei != circle.end(); pointInCirclei++)
-            for (auto pointInCirclej = pointInCirclei + 1; pointInCirclej != circle.end(); pointInCirclej++)
+        auto content = selectedCircles[circle];
+        for (auto pointInCirclei = content.begin(); pointInCirclei != content.end(); pointInCirclei++)
+            for (auto pointInCirclej = pointInCirclei + 1; pointInCirclej != content.end(); pointInCirclej++)
             {
                 vector_t pi;
                 QRectF pointBoundsi = (*pointInCirclei)->boundingRect();
@@ -81,7 +254,7 @@ void MainWindow::on_pushButtonLine_clicked()
                 init(pj, pointBoundsj.x() + POINT_RADIUS / 2, pointBoundsj.y() + POINT_RADIUS / 2);
 
                 int left = 0, right = 0;
-                for (auto point: circle)
+                for (auto point: content)
                 {
                     if (point == *pointInCirclej || point == *pointInCirclei)
                         continue;
@@ -108,14 +281,19 @@ void MainWindow::on_pushButtonLine_clicked()
                 }
             }
 
+        circle_t c;
+        QRectF circleBounds = circle->boundingRect();
+        double rad = circleBounds.width() / 2;
+        init(c, circleBounds.x() + rad, circleBounds.y() + rad, rad);
+
         if (lineExist)
         {
+            //double k = fit(c, p1, p2);
             ui->graphicsview->setupScene();
             drawer_t drawer;
             init(ui->graphicsview->scene(), drawer, Qt::red, Qt::red);
-            qDebug() << ui->graphicsview->getlinesGroup();
-            ui->graphicsview->addlinesGroup(draw_line(drawer, p1, p2, QString(" [left: %1").arg(leftFinal) + QString("|%1 :right]").arg(rightFinal)));
+            QGraphicsLineItem *line = draw_line(drawer, p1, p2, QString(" [left: %1").arg(leftFinal) + QString("|%1 :right]").arg(rightFinal));
+            ui->graphicsview->addlinesGroup(line);
         }
     }
 }
-

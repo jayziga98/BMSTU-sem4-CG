@@ -2,5 +2,7 @@
     <qresource prefix="/">
         <file>icons/circle-16.png</file>
         <file>icons/circle-outline-16.png</file>
+        <file>icons/headslap.gif</file>
+        <file>icons/kolobok-grudge.gif</file>
     </qresource>
 </RCC>

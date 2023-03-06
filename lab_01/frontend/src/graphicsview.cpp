@@ -1,10 +1,10 @@
 #include "graphicsview.h"
 #include "drawer.h"
-#include "vector.h"
 
 #include <QDrag>
 #include <qstring.h>
 #include <QDragEnterEvent>
+#include <QGestureEvent>
 #include <QMimeData>
 
 graphicsView::graphicsView(QWidget *parent) : QGraphicsView(parent)
@@ -12,11 +12,183 @@ graphicsView::graphicsView(QWidget *parent) : QGraphicsView(parent)
     QGraphicsScene *scene = new QGraphicsScene(this);
 
     this->setScene(scene);
-    this->setAlignment(Qt::AlignTop | Qt::AlignLeft);
+    qDebug() << this->scene();
+    this->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
     this->setStyleSheet("QGraphicsView {background-color: white}");
     this->setMouseTracking(true);
 
     this->linesGroup = nullptr;
+    this->todraw = POINT;
+
+    this->scale(1, -1);
+
+    this->setupScene();
+    drawer_t drawer;
+    init(this->scene(), drawer, Qt::black, Qt::black);
+
+    viewport()->grabGesture(Qt::PinchGesture);
+}
+
+void graphicsView::setupScene()
+{
+    auto rcontent = this->contentsRect();
+    this->setSceneRect(0, rcontent.height(), rcontent.width(), -rcontent.height());
+}
+
+void graphicsView::clearScene()
+{
+    this->setupScene();
+    drawer_t drawer;
+    init(this->scene(), drawer, Qt::black, Qt::black);
+
+    QList <QGraphicsItem *> items = drawer.scene->items();
+    for (auto item: items)
+        remove_item(drawer, item);
+
+    this->drawAxis();
+    //this->fitInView(this->sceneRect(), Qt::KeepAspectRatio);
+}
+
+void graphicsView::clearSelected()
+{
+    this->setupScene();
+    drawer_t drawer;
+    init(this->scene(), drawer, Qt::black, Qt::black);
+
+    QList <QGraphicsItem *> items = drawer.scene->selectedItems();
+    for (auto item: items)
+        remove_item(drawer, item);
+
+    //this->fitInView(this->sceneRect(), Qt::KeepAspectRatio);
+}
+
+void graphicsView::fitAll()
+{
+    this->setupScene();
+    QRectF sceneBounds = this->scene()->itemsBoundingRect();
+
+    if (sceneBounds.contains(this->sceneRect()))
+    {
+        this->fitInView(sceneBounds, Qt::KeepAspectRatio);
+        this->centerOn(0, 0);
+    }
+}
+
+void graphicsView::drawAxis()
+{
+    QRectF sceneBounds = this->sceneRect();
+    if (this->axisX)
+        this->scene()->removeItem(this->axisX);
+    if (this->axisY)
+        this->scene()->removeItem(this->axisY);
+    this->axisX = this->scene()->addLine(QLineF(-sceneBounds.width(), 0, sceneBounds.width(), 0), QPen(Qt::gray, 4, Qt::DashLine));
+    this->axisY = this->scene()->addLine(QLineF(0, sceneBounds.height(), 0, -sceneBounds.height()), QPen(Qt::gray, 4, Qt::DashLine));
+    this->fitAll();
+}
+
+void graphicsView::mousePressEvent(QMouseEvent *event)
+{
+    this->linesGroup = this->removeItems(this->linesGroup);
+
+    this->setCursor(Qt::ArrowCursor);
+
+    this->setupScene();
+    drawer_t drawer;
+    init(this->scene(), drawer, Qt::black, Qt::black);
+
+    QPointF pos = mapToScene(event->pos());
+
+    QGraphicsItem *item = drawer.scene->itemAt(pos, QTransform());
+    if(event->buttons().testFlag(Qt::LeftButton) && !event->modifiers().testFlag(Qt::ControlModifier))
+    {
+        basePoint = pos;
+        startDrawing = draw(drawer, pos, this->ToDraw());
+        event->buttons().setFlag(Qt::LeftButton);
+    }
+    else if (event->buttons().testFlag(Qt::RightButton))
+        remove_item(drawer, item);
+
+    QGraphicsView::mousePressEvent(event);
+}
+
+void graphicsView::mouseMoveEvent(QMouseEvent *event)
+{
+    this->setupScene();
+    QPointF pos = mapToScene(event->pos());
+
+    drawAxis();
+
+    QGraphicsItem *item = this->scene()->itemAt(pos, QTransform());
+
+    resize_circle(startDrawing, basePoint, pos);
+
+    if (item != nullptr)
+    {
+        if (event->buttons().testFlag(Qt::LeftButton))
+            this->setCursor(Qt::ClosedHandCursor);
+        else
+            item->setCursor(Qt::PointingHandCursor);
+    }
+
+    QGraphicsView::mouseMoveEvent(event);
+}
+
+void graphicsView::mouseReleaseEvent(QMouseEvent *event)
+{
+    this->fitAll();
+
+    this->linesGroup = this->removeItems(this->linesGroup);
+
+    this->setCursor(Qt::ArrowCursor);
+
+    startDrawing = 0;
+
+    QPointF pos = mapToScene(event->pos());
+
+    QGraphicsItem *item = this->scene()->itemAt(pos, QTransform());
+    update_tooltip(item, pos);
+
+    QGraphicsView::mouseReleaseEvent(event);
+}
+
+bool graphicsView::viewportEvent(QEvent *event)
+{
+    this->setupScene();
+    if (event->type() == QEvent::Gesture)
+    {
+        gestureEvent(static_cast<QGestureEvent*>(event));
+    }
+    else if (event->type() == QEvent::TouchBegin)
+    {
+      return false;
+    }
+
+    return QGraphicsView::viewportEvent(event);
+}
+
+void graphicsView::gestureEvent(QGestureEvent *event)
+{
+    if (QGesture *pinchGesture = event->gesture(Qt::PinchGesture))
+    {
+        QPinchGesture *pinch = static_cast<QPinchGesture *>(pinchGesture);
+
+        const ViewportAnchor anchor = transformationAnchor();
+        setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
+        scale(pinch->scaleFactor(), pinch->scaleFactor());
+        setTransformationAnchor(anchor);
+    }
+}
+
+void graphicsView::keyPressEvent(QKeyEvent *event)
+{
+    if (event->key() == Qt::Key_Delete)
+        this->clearSelected();
+}
+
+void graphicsView::createlinesGroup()
+{
+    this->linesGroup = new QGraphicsItemGroup();
+    this->scene()->addItem(this->linesGroup);
 }
 
 QGraphicsItemGroup *graphicsView::removeItems(QGraphicsItemGroup *group)
@@ -30,116 +202,9 @@ QGraphicsItemGroup *graphicsView::removeItems(QGraphicsItemGroup *group)
     return nullptr;
 }
 
-void graphicsView::setupScene()
-{
-    auto rcontent = this->contentsRect();
-    this->setSceneRect(0, 0, rcontent.width(), rcontent.height());
-}
-
-void graphicsView::mousePressEvent(QMouseEvent *event)
-{
-    this->linesGroup = this->removeItems(this->linesGroup);
-
-    if(event->modifiers().testFlag(Qt::ShiftModifier)) {
-        setDragMode(QGraphicsView::ScrollHandDrag);
-        qDebug() << "setting dragging mode";
-        QGraphicsView::mousePressEvent(event);
-    }
-
-    this->setupScene();
-    drawer_t drawer;
-    init(this->scene(), drawer, Qt::black, Qt::black);
-
-    QPointF pos = mapToScene(event->pos());
-
-    point_t p;
-    init(p, pos.x(), pos.y());
-
-    QGraphicsItem *item = drawer.scene->itemAt(pos, QTransform());
-    if(event->buttons().testFlag(Qt::LeftButton) && !event->modifiers().testFlag(Qt::ControlModifier))
-    {
-        if (this->ToDraw() == POINT)
-            draw_point(drawer, p);
-        else if (!startDrawing && this->ToDraw() == CIRCLE)
-        {
-            circle_t c;
-            init(c, pos.x(), pos.y(), POINT_RADIUS * 2);
-            basePoint = pos;
-            draw_circle(drawer, c);
-            startDrawing = drawer.scene->itemAt(pos, QTransform());
-        }
-    }
-    else
-    {
-        if (event->buttons().testFlag(Qt::RightButton))
-            drawer.scene->removeItem(item);
-        this->setCursor(Qt::ClosedHandCursor);
-    }
-
-    QGraphicsView::mousePressEvent(event);
-}
-
-void graphicsView::mouseMoveEvent(QMouseEvent *event)
-{
-    QPointF pos = mapToScene(event->pos());
-
-    QGraphicsItem *item = this->scene()->itemAt(pos, QTransform());
-    if (item != nullptr)
-    {
-        if (startDrawing)
-        {
-            vector_t vrad;
-            init(vrad, basePoint.x(), basePoint.y(), pos.x(), pos.y());
-            double rad = length(vrad) + startDrawing->boundingRect().width() / 4;
-            QGraphicsEllipseItem *castedItem = qgraphicsitem_cast<QGraphicsEllipseItem *>(startDrawing);
-            castedItem->setRect(basePoint.x() - rad, basePoint.y() - rad, rad * 2, rad * 2);
-        }
-
-        if (event->buttons().testFlag(Qt::LeftButton))
-            this->setCursor(Qt::ClosedHandCursor);
-        else
-            item->setCursor(Qt::PointingHandCursor);
-    }
-
-    QGraphicsView::mouseMoveEvent(event);
-}
-
-void graphicsView::mouseReleaseEvent(QMouseEvent *event)
-{
-    this->linesGroup = this->removeItems(this->linesGroup);
-
-    this->setCursor(Qt::ArrowCursor);
-    startDrawing = 0;
-
-    QPointF pos = mapToScene(event->pos());
-
-    QGraphicsItem *item = this->scene()->itemAt(pos, QTransform());
-    if (item != nullptr)
-    {
-        item->setFlag(QGraphicsEllipseItem::ItemIsMovable);
-        QString toolTip = item->toolTip();
-        double r = 0;
-        if (toolTip.contains('r'))
-        {
-            r = toolTip.right(toolTip.indexOf(')') - toolTip.indexOf('r') - 3).toDouble();
-            item->setToolTip(QString("(x: %1, ").arg(pos.x(), 0, 'g', 3) + QString("y: %1, ").arg(pos.y(), 0, 'g', 3) + QString("r: %1)").arg(r, 0, 'g', 3));
-        }
-        else
-            item->setToolTip(QString("(x: %1, ").arg(pos.x(), 0, 'g', 3) + QString("y: %1)").arg(pos.y(), 0, 'g', 3));
-    }
-
-    QGraphicsView::mouseReleaseEvent(event);
-}
-
 QGraphicsItemGroup *graphicsView::getlinesGroup()
 {
     return this->linesGroup;
-}
-
-void graphicsView::createlinesGroup()
-{
-    this->linesGroup = new QGraphicsItemGroup();
-    this->scene()->addItem(this->linesGroup);
 }
 
 void graphicsView::addlinesGroup(QGraphicsItem *item)

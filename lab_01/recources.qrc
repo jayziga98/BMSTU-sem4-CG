@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file>headslap.gif</file>
+        <file>kolobok-grudge.gif</file>
+    </qresource>
+</RCC>
