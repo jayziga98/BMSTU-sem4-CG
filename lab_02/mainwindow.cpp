@@ -49,15 +49,18 @@ void MainWindow::drawGrid()
 
     QRectF sceneBounds = ui->graphicsView->scene()->itemsBoundingRect();
 
-    double width = fmax(500, sceneBounds.width());
-    double height = fmax(500, sceneBounds.height());
+//    double width = fmax(500, sceneBounds.width());
+//    double height = fmax(500, sceneBounds.height());
+    double width = 1000;
+    double height = 1000;
 
-    int delim = (int)(fmin(width, height) / 10);
+//    int delim = (int)(fmin(width, height) / 10);
+    int delim = 50;
 
     QPen penGrid = QPen(Qt::lightGray);
     QPen penDelim = QPen(Qt::red);
     QColor textColor = QColor(Qt::black);
-    QFont textFont = QFont("Helvetica", 14 + (int)(2 * (delim / 50)), QFont::Bold);
+    QFont textFont = QFont("Helvetica", 12 + (int)(2 * (delim / 50)), QFont::Bold);
 
     for (int i = delim; (double)i <= width; i += delim)
     {
@@ -141,10 +144,10 @@ void MainWindow::fitAll()
 
     QRectF sceneBounds = ui->graphicsView->scene()->itemsBoundingRect();
     QPointF center = QPointF(sceneBounds.x() + sceneBounds.width() / 2, sceneBounds.y() + sceneBounds.height() / 2);
-    sceneBounds.setWidth(sceneBounds.width()*0.9);         // to tighten-up margins
-    sceneBounds.setHeight(sceneBounds.height()*0.9);
+    sceneBounds.setWidth(sceneBounds.width()*1);
+    sceneBounds.setHeight(sceneBounds.height()*1);
     ui->graphicsView->fitInView(sceneBounds, Qt::KeepAspectRatio);
-    ui->graphicsView->centerOn(center);
+//    ui->graphicsView->centerOn(0, 0);
 
     drawGrid();
 }
@@ -177,7 +180,7 @@ void MainWindow::on_action_triggered()
     figure_item_scale(this->item, 1, -1, 0, 0, 0);
 
     ui->graphicsView->scene()->addItem(this->item);
-    fitAll();
+//    fitAll();
 }
 
 void MainWindow::on_pushButton_rotate_clicked()
@@ -198,7 +201,7 @@ void MainWindow::on_pushButton_rotate_clicked()
 
     this->pool->allocAndSend(ROTATE, this->item, std::vector<double> {angle, base, basex, basey});
 
-    fitAll();
+//    fitAll();
 }
 
 
@@ -210,6 +213,8 @@ void MainWindow::on_pushButton_move_clicked()
         return;
     }
 
+    qDebug() << ui->graphicsView->scene()->itemsBoundingRect();
+
     double dx = ui->doubleSpinBox_dx->value();
     double dy = ui->doubleSpinBox_dy->value();
 
@@ -217,7 +222,7 @@ void MainWindow::on_pushButton_move_clicked()
 
     this->pool->allocAndSend(MOVE, this->item, std::vector<double> {dx, dy});
 
-    fitAll();
+//    fitAll();
 }
 
 void MainWindow::on_pushButton_scale_clicked()
@@ -233,13 +238,15 @@ void MainWindow::on_pushButton_scale_clicked()
 
     double basex = ui->doubleSpinBox_baseX->value();
     double basey = ui->doubleSpinBox_baseY->value();
-    double base = ui->checkBox_base->isChecked() ? 0.0 : 1.0;
+    double base = ui->checkBox_base->isChecked() ? 1.0 : 0.0;
 
     //figure_item_scale(this->item, kx, ky, 0, basex, basey);
 
     this->pool->allocAndSend(SCALE, this->item, std::vector<double> {kx, ky, base, basex, basey});
 
-    fitAll();
+    qDebug() << ui->graphicsView->scene()->itemsBoundingRect();
+
+//    fitAll();
 }
 
 
@@ -257,7 +264,7 @@ void MainWindow::on_pushButton_toCenter_clicked()
 
     this->pool->allocAndSend(MOVE, this->item, std::vector<double> {-basex, -basey});
 
-    fitAll();
+//    fitAll();
 }
 
 void MainWindow::on_actionAboutTask_triggered()
@@ -333,20 +340,20 @@ int MainWindow::askMessage(QString title, QString text)
 
 void MainWindow::showEvent(QShowEvent* event)
 {
-    QMessageBox msgBox;
-    msgBox.setText("Дорогой пользователь!");
-    msgBox.setInformativeText("Предлагаю ознакомиться со справкой о программе\n"
-                              "Программа позволяет просматривать рисунок и выполнять операции масштабирования, поворота, перемещения над ним\n"
-                              "Прежде чем выполнять операции требуется выбрать рисунок, чтобы это сделать воспользуйся верхним меню или сочетанием клавиш «Ctrl+O» («Cmd+O»).\n"
-                              "После ты можешь выполнять перемещение, масштабирование и поворот исходного рисунка. Дополнительно ты можешь задать опорную точку масштабирования и поворота.\n"
-                              "Программа позволяет отменять выполненные действия сочетанием клавиш «Ctrl+Z» («Cmd+Z»)  или с помощью меню «Правка» -> «Отменить»\n"
-                              "Отмененные действия можно повторить сочетанием клавиш «Ctrl+Shift+Z» («Cmd+Shift+Z»)  или с помощью меню «Правка» -> «Повторить»\n"
-                              "Данную информацию можно повторно просмотреть в меню «Справка» -> «О программе» или просмотреть подсказки при наведении на действия в левом боковом меню\n"
-                              "Приятного использования!");
+//    QMessageBox msgBox;
+//    msgBox.setText("Дорогой пользователь!");
+//    msgBox.setInformativeText("Предлагаю ознакомиться со справкой о программе\n"
+//                              "Программа позволяет просматривать рисунок и выполнять операции масштабирования, поворота, перемещения над ним\n"
+//                              "Прежде чем выполнять операции требуется выбрать рисунок, чтобы это сделать воспользуйся верхним меню или сочетанием клавиш «Ctrl+O» («Cmd+O»).\n"
+//                              "После ты можешь выполнять перемещение, масштабирование и поворот исходного рисунка. Дополнительно ты можешь задать опорную точку масштабирования и поворота.\n"
+//                              "Программа позволяет отменять выполненные действия сочетанием клавиш «Ctrl+Z» («Cmd+Z»)  или с помощью меню «Правка» -> «Отменить»\n"
+//                              "Отмененные действия можно повторить сочетанием клавиш «Ctrl+Shift+Z» («Cmd+Shift+Z»)  или с помощью меню «Правка» -> «Повторить»\n"
+//                              "Данную информацию можно повторно просмотреть в меню «Справка» -> «О программе» или просмотреть подсказки при наведении на действия в левом боковом меню\n"
+//                              "Приятного использования!");
 
-    msgBox.setStandardButtons(QMessageBox::Ok);
-    msgBox.setDefaultButton(QMessageBox::Ok);
-    msgBox.exec();
+//    msgBox.setStandardButtons(QMessageBox::Ok);
+//    msgBox.setDefaultButton(QMessageBox::Ok);
+//    msgBox.exec();
 }
 
 void MainWindow::closeEvent(QCloseEvent* event)
