@@ -21,12 +21,12 @@ typedef struct {
     QColor color;
 } line_params_t;
 
-QGraphicsItem *line(QLineF &line, line_params_t &params);
-QGraphicsItem *line_cda(QLineF &line, QColor color);
-QGraphicsItem *line_bresenham_int(QLineF &line, QColor color);
-QGraphicsItem *line_bresenham_float(QLineF &line, QColor color);
-QGraphicsItem *line_bresenham_no_grad(QLineF &line, QColor color);
-QGraphicsItem *line_wu(QLineF &line, QColor color);
+QGraphicsItem *line(QLineF &line, line_params_t &params, int *step);
+QGraphicsItem *line_cda(QLineF &line, QColor color, int *step);
+QGraphicsItem *line_bresenham_int(QLineF &line, QColor color, int *step);
+QGraphicsItem *line_bresenham_float(QLineF &line, QColor color, int *step);
+QGraphicsItem *line_bresenham_no_grad(QLineF &line, QColor color, int *step);
+QGraphicsItem *line_wu(QLineF &line, QColor color, int *step);
 QGraphicsItem *line_biblio(QLineF &line, QColor color);
 
 #endif // LINE_H

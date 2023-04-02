@@ -1,22 +1,29 @@
 #include "line.h"
 #include <QGraphicsItemGroup>
 
-QGraphicsItem *line(QLineF &line, line_params_t &params)
+QGraphicsItem *line(QLineF &line, line_params_t &params, int *step)
 {
+    if (step)
+        *step = 0;
+
     QGraphicsItem *item = nullptr;
 
     switch (params.type) {
     case CDA:
-        item = line_cda(line, params.color);
+        item = line_cda(line, params.color, step);
         break;
     case BRESENHAM_FLOAT:
-        item = line_bresenham_float(line, params.color);
+        item = line_bresenham_float(line, params.color, step);
+        break;
     case BRESENHAM_INT:
-        item = line_bresenham_int(line, params.color);
+        item = line_bresenham_int(line, params.color, step);
+        break;
     case BRESENHAM_NO_GRAD:
-        item = line_bresenham_no_grad(line, params.color);
+        item = line_bresenham_no_grad(line, params.color, step);
+        break;
     case WU:
-        item = line_wu(line, params.color);
+        item = line_wu(line, params.color, step);
+        break;
     case BIBLIO:
         item = line_biblio(line, params.color);
         break;
@@ -42,8 +49,11 @@ QGraphicsItem *pixel(QPointF p, QColor color)
     return pixel;
 }
 
-QGraphicsItem *line_cda(QLineF &line, QColor color)
+QGraphicsItem *line_cda(QLineF &line, QColor color, int *step)
 {
+    if (step)
+        *step = 0;
+
     QPointF start = line.p1();
     QPointF end = line.p2();
 
@@ -62,14 +72,20 @@ QGraphicsItem *line_cda(QLineF &line, QColor color)
         start.setX(start.x() + inc_x);
         start.setY(start.y() + inc_y);
 
+        if (step)
+            (*step)++;
+
         item->addToGroup(pixel(start, color));
     }
 
     return item;
 }
 
-QGraphicsItem *line_bresenham_int(QLineF &line, QColor color)
+QGraphicsItem *line_bresenham_int(QLineF &line, QColor color, int *step)
 {
+    if (step)
+        *step = 0;
+
     QPointF start = line.p1();
     QPointF end = line.p2();
 
@@ -86,12 +102,10 @@ QGraphicsItem *line_bresenham_int(QLineF &line, QColor color)
     dy = abs(dy);
 
     bool swapped = false;
-    if (dx > dy)
+    if (dy > dx)
     {
         swapped = true;
-        int t = dx;
-        dx = dy;
-        dy = t;
+        std::swap(dx, dy);
     }
 
     int e = 2 * dy - dx;
@@ -99,24 +113,26 @@ QGraphicsItem *line_bresenham_int(QLineF &line, QColor color)
     QGraphicsItemGroup *item = new QGraphicsItemGroup();
 
     item->addToGroup(pixel(istart, color));
-    for (int x = istart.x(); x <= iend.x(); x++)
+    for (int i = 0; i <= dx; i++)
     {
         if (e >= 0)
         {
-            if (!swapped)
-                istart.setY(istart.y() + sy);
-            else
-                istart.setX(istart.x() + sx);
-
-            e -= 2 * dx;
-        }
-
-        if (!swapped)
             istart.setX(istart.x() + sx);
-        else
             istart.setY(istart.y() + sy);
 
-        e += 2 * dy;
+            if (step)
+                (*step)++;
+
+            e += 2 * dy - 2 * dx;
+        }
+        else {
+            if (!swapped)
+                istart.setX(istart.x() + sx);
+            else
+                istart.setY(istart.y() + sy);
+
+            e += 2 * dy;
+        }
 
         item->addToGroup(pixel(istart, color));
     }
@@ -124,65 +140,11 @@ QGraphicsItem *line_bresenham_int(QLineF &line, QColor color)
     return item;
 }
 
-QGraphicsItem *line_bresenham_float(QLineF &line, QColor color)
+QGraphicsItem *line_bresenham_float(QLineF &line, QColor color, int *step)
 {
-    QPointF start = line.p1();
-    QPointF end = line.p2();
+    if (step)
+        *step = 0;
 
-    QPoint istart = QPoint(round(line.p1().x()), round(line.p1().y()));
-    QPoint iend = QPoint(round(line.p2().x()), round(line.p2().y()));
-
-    double dx = end.x() - start.x();
-    double dy = end.y() - start.y();
-
-    int sx = dx > 0 ? 1 : -1;
-    int sy = dy > 0 ? 1 : -1;
-
-    dx = abs(dx);
-    dy = abs(dy);
-
-    bool swapped = false;
-    if (dx > dy)
-    {
-        swapped = true;
-        int t = dx;
-        dx = dy;
-        dy = t;
-    }
-
-    double m = dy / dx;
-    double e = m - 0.5;
-
-    QGraphicsItemGroup *item = new QGraphicsItemGroup();
-
-    item->addToGroup(pixel(start, color));
-    for (int x = istart.x(); x <= iend.x(); x++)
-    {
-        while (e >= 0)
-        {
-            if (!swapped)
-                start.setY(start.y() + sy);
-            else
-                start.setX(start.x() + sx);
-
-            e -= 1;
-        }
-
-        if (!swapped)
-            start.setX(start.x() + sx);
-        else
-            start.setY(start.y() + sy);
-
-        e += m;
-
-        item->addToGroup(pixel(start, color));
-    }
-
-    return item;
-}
-
-QGraphicsItem *line_bresenham_no_grad(QLineF &line, QColor color)
-{
     QPointF start = line.p1();
     QPointF end = line.p2();
 
@@ -202,49 +164,117 @@ QGraphicsItem *line_bresenham_no_grad(QLineF &line, QColor color)
     if (dy > dx)
     {
         swapped = true;
-        int t = dx;
-        dx = dy;
-        dy = t;
+        std::swap(dx, dy);
     }
 
-    int i = 255;
+    double m = dy / dx;
 
-    double m = i * dy / dx;
-    double w = i - m;
-    double e = i / 2;
+    double e = m - 0.5;
 
     QGraphicsItemGroup *item = new QGraphicsItemGroup();
 
-    color.setAlpha(m / 2);
     item->addToGroup(pixel(start, color));
-    for (int x = istart.x(); x <= iend.x(); x++)
+    for (int i = 0; i <= dx; i++)
     {
-        if (e < w)
+        if (e >= 0)
         {
+            istart.setX(istart.x() + sx);
+            istart.setY(istart.y() + sy);
+
+            if (step)
+                (*step)++;
+
+            e -= 1;
+        }
+        else {
             if (!swapped)
-                start.setX(start.x() + sx);
+                istart.setX(istart.x() + sx);
             else
-                start.setY(start.y() + sy);
+                istart.setY(istart.y() + sy);
 
-            e +=m;
-        }
-        else
-        {
-            start.setY(start.y() + sy);
-            start.setX(start.x() + sx);
-
-            e -= w;
+            e += m;
         }
 
-        color.setAlpha(e);
+
         item->addToGroup(pixel(start, color));
     }
 
     return item;
 }
 
-QGraphicsItem *line_wu(QLineF &line, QColor color)
+QGraphicsItem *line_bresenham_no_grad(QLineF &line, QColor color, int *step)
 {
+    if (step)
+        *step = 0;
+
+    QPointF start = line.p1();
+    QPointF end = line.p2();
+
+    QPoint istart = QPoint(round(line.p1().x()), round(line.p1().y()));
+    QPoint iend = QPoint(round(line.p2().x()), round(line.p2().y()));
+
+    double dx = end.x() - start.x();
+    double dy = end.y() - start.y();
+
+    int sx = dx > 0 ? 1 : -1;
+    int sy = dy > 0 ? 1 : -1;
+
+    dx = abs(dx);
+    dy = abs(dy);
+
+    bool swapped = false;
+    if (dy > dx)
+    {
+        swapped = true;
+        std::swap(dx, dy);
+    }
+
+    int i = 255;
+
+    double m = dy / dx * i;
+    double w = i - m;
+    double e = i / 2;
+
+    QGraphicsItemGroup *item = new QGraphicsItemGroup();
+
+//    color.setAlpha(m / 2);
+//    item->addToGroup(pixel(start, color));
+    for (int i = 0; i <= dx; i++)
+    {
+        if (e >= w)
+        {
+            istart.setY(istart.y() + sy);
+            istart.setX(istart.x() + sx);
+
+            if (step)
+                (*step)++;
+
+            e -= w;
+        }
+        else
+        {
+            if (!swapped)
+                istart.setX(istart.x() + sx);
+            else
+                istart.setY(istart.y() + sy);
+
+            e += m;
+        }
+
+        color.setAlpha(fmax(0, fmin(255, e)));
+        item->addToGroup(pixel(istart, color));
+
+        e += m;
+    }
+
+    return item;
+}
+
+QGraphicsItem *line_wu(QLineF &line, QColor color, int *step)
+{
+    if (step)
+        *step = 0;
+
     QPoint istart = QPoint(round(line.p1().x()), round(line.p1().y()));
     QPoint iend = QPoint(round(line.p2().x()), round(line.p2().y()));
 
@@ -255,39 +285,38 @@ QGraphicsItem *line_wu(QLineF &line, QColor color)
     dy = abs(dy);
 
     bool swapped = false;
-    if (dx > dy)
+    if (dy > dx)
     {
         swapped = true;
-        int t = dx;
-        dx = dy;
-        dy = t;
+        std::swap(dx, dy);
     }
 
-    double m = dy / dx;
+    if (istart.x() > iend.x())
+        std::swap(istart, iend);
+
+    double m = 1;
+    if (dx)
+        m = dy / dx;
 
     QGraphicsItemGroup *item = new QGraphicsItemGroup();
-
-    item->addToGroup(pixel(istart, color));
-    item->addToGroup(pixel(iend, color));
 
     double y = istart.y() + m;
     for (int x = istart.x() + 1; x <= iend.x() - 1; x++)
     {
-        int x1 = x;
-        int y1 = y;
+        QPoint cur = QPoint(x, y);
         if (swapped)
         {
-            y1 = x;
-            x1 = y;
+            cur.setX(y);
+            cur.setY(x);
         }
 
-        istart.setX(x1);
+        istart.setX(cur.x());
 
-        istart.setY(y1);
+        istart.setY(cur.y());
         color.setAlpha(255 - (y - (int)y) * 255);
         item->addToGroup(pixel(istart, color));
 
-        istart.setY(y1 + 1);
+        istart.setY(cur.y() + 1);
         color.setAlpha((y - (int)y) * 255);
         item->addToGroup(pixel(istart, color));
 

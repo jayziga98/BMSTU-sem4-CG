@@ -31,6 +31,8 @@ private slots:
 
     void on_pushButton_time_clicked();
 
+    void on_pushButton_grad_clicked();
+
 private:
     Ui::MainWindow *ui;
 };

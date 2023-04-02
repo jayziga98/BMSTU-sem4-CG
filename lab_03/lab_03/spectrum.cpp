@@ -6,13 +6,13 @@ QGraphicsItem *spectrum(QPointF &c, qreal len, qreal angle, line_params_t &param
 
     qreal rad = angle * PI / 180;
 
-    for (qreal i = 0.0; i < 2 * PI; i += rad)
+    for (qreal i = 0.0; i < 2 * PI - 1e-7; i += rad)
     {
         QPointF end = QPointF(c.x() + cos(i) * len, c.y() - sin(i) * len);
 
         QLineF new_line = QLineF(c, end);
 
-        item->addToGroup(line(new_line, params));
+        item->addToGroup(line(new_line, params, nullptr));
     }
 
     return item;

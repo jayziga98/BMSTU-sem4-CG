@@ -10,6 +10,7 @@
 #include <QtCharts/QLegend>
 #include <QtCharts/QBarCategoryAxis>
 #include <QtCharts/QValueAxis>
+#include <QtCharts/QLineSeries>
 
 MainWindow::MainWindow(STaskPool *pool, QWidget *parent)
     : QMainWindow(parent)
@@ -52,7 +53,7 @@ void MainWindow::on_pushButton_line_clicked()
     params.color = ui->pushButton_pen->palette().color(QWidget::backgroundRole());
     params.type = curAlgorithm();
 
-    this->pool->allocAndSend(ui->graphicsView->scene(), line(qline, params));
+    this->pool->allocAndSend(ui->graphicsView->scene(), line(qline, params, nullptr));
 }
 
 
@@ -101,7 +102,7 @@ void MainWindow::on_pushButton_spectrum_clicked()
 
 void MainWindow::on_pushButton_time_clicked()
 {
-    qreal len = 100000;
+    qreal len = 10000;
 
     QStringList categories;
     categories << "ЦДА" << "Брезенхэм (вещественные)" << "Брезенхэм (целые)" << "Брезенхэм (устранение ступенчатости)" << "Ву" << "Библиотечная";
@@ -122,8 +123,10 @@ void MainWindow::on_pushButton_time_clicked()
 
 
         auto t1 = std::chrono::high_resolution_clock::now();
-        line(qline, params);
+        QGraphicsItem *item = line(qline, params, nullptr);
+        ui->graphicsView->scene()->addItem(item);
         auto t2 = std::chrono::high_resolution_clock::now();
+        ui->graphicsView->scene()->removeItem(item);
 
         std::chrono::duration<double, std::milli> ms_double = t2 - t1;
 
@@ -134,9 +137,6 @@ void MainWindow::on_pushButton_time_clicked()
     QBarSeries *series = new QBarSeries();
     series->append(sets);
 
-    for (int curType = 0; curType <= algoType::BIBLIO; curType++)
-        qDebug() << curType << sets[curType]->at(0);
-
     QChart *chart = new QChart();
     chart->addSeries(series);
     chart->setTitle("Временные характеристики алгоритмов");
@@ -144,7 +144,7 @@ void MainWindow::on_pushButton_time_clicked()
 
     QValueAxis *axisY = new QValueAxis();
     axisY->setTickCount(20);
-    axisY->setLabelFormat("%.ems");
+    axisY->setLabelFormat("%.lfms");
     chart->addAxis(axisY, Qt::AlignLeft);
     series->attachAxis(axisY);
 
@@ -154,6 +154,63 @@ void MainWindow::on_pushButton_time_clicked()
     axisX->append(methods);
     chart->addAxis(axisX, Qt::AlignBottom);
     series->attachAxis(axisX);
+
+    chart->legend()->setVisible(true);
+    chart->legend()->setAlignment(Qt::AlignBottom);
+
+    QChartView *chartView = new QChartView(chart);
+    chartView->setRenderHint(QPainter::Antialiasing);
+
+    chartView->resize(QSize(900, 600));
+    chartView->show();
+}
+
+
+void MainWindow::on_pushButton_grad_clicked()
+{
+    qreal len = 100;
+    int interval = 15;
+
+    QStringList categories;
+    categories << "ЦДА" << "Брезенхэм (вещественные)" << "Брезенхэм (целые)" << "Брезенхэм (устранение ступенчатости)" << "Ву";
+
+    QList <QLineSeries *> sets = QList <QLineSeries *> ();
+    for (int curType = 0; curType < categories.length(); curType++)
+    {
+        QLineSeries *series = new QLineSeries();
+        series->setName(categories[curType]);
+        sets.append(series);
+    }
+
+    for (int angle = 0; angle <= 90; angle += interval)
+        for (int curType = 0; curType < categories.length(); curType++)
+        {
+            qreal rad = angle * PI / 180;
+
+            QPointF start = QPointF(0, 0);
+            QPointF end = QPointF(start.x() + cos(rad) * len, start.y() - sin(rad) * len);
+
+            QLineF qline = QLineF(start, end);
+
+            line_params_t params;
+            params.color = Qt::black;
+            params.type = algoType(curType);
+
+            int step = 0;
+            line(qline, params, &step);
+
+
+            sets[curType]->append(QPointF(angle, step));
+        }
+
+    QChart *chart = new QChart();
+
+    for (int curType = 0; curType < categories.length(); curType++)
+        chart->addSeries(sets[curType]);
+
+    chart->setTitle("Ступенчатость отрезков");
+    chart->setAnimationOptions(QChart::SeriesAnimations);
+    chart->createDefaultAxes();
 
     chart->legend()->setVisible(true);
     chart->legend()->setAlignment(Qt::AlignBottom);
