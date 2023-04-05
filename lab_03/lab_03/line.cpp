@@ -294,7 +294,6 @@ static int iPartOfNumber(qreal x)
 
 static qreal fPartOfNumber(qreal x)
 {
-    //qDebug() << -2.7 << floor(-2.7) << ceil(-2.7) << -2.7 - int(-2.7) << -2.7 - floor(-2.7);
     return x - iPartOfNumber(x);
 }
 

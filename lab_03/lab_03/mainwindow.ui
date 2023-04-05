@@ -55,7 +55,7 @@
        <item row="1" column="0">
         <widget class="QTabWidget" name="tabWidget">
          <property name="sizePolicy">
-          <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
+          <sizepolicy hsizetype="Minimum" vsizetype="Maximum">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
@@ -66,7 +66,7 @@
           </font>
          </property>
          <property name="currentIndex">
-          <number>0</number>
+          <number>1</number>
          </property>
          <widget class="QWidget" name="tab">
           <attribute name="title">
@@ -208,7 +208,7 @@
                 <item row="0" column="0">
                  <widget class="QLabel" name="label_3">
                   <property name="sizePolicy">
-                   <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                   <sizepolicy hsizetype="Minimum" vsizetype="Maximum">
                     <horstretch>0</horstretch>
                     <verstretch>0</verstretch>
                    </sizepolicy>
@@ -371,14 +371,20 @@
                     <verstretch>0</verstretch>
                    </sizepolicy>
                   </property>
+                  <property name="decimals">
+                   <number>3</number>
+                  </property>
                   <property name="minimum">
-                   <double>-360.000000000000000</double>
+                   <double>0.500000000000000</double>
                   </property>
                   <property name="maximum">
-                   <double>360.000000000000000</double>
+                   <double>359.000000000000000</double>
                   </property>
                   <property name="singleStep">
                    <double>15.000000000000000</double>
+                  </property>
+                  <property name="value">
+                   <double>1.000000000000000</double>
                   </property>
                  </widget>
                 </item>
@@ -502,6 +508,9 @@
                     <property name="decimals">
                      <number>4</number>
                     </property>
+                    <property name="minimum">
+                     <double>5.000000000000000</double>
+                    </property>
                     <property name="maximum">
                      <double>9999.000000000000000</double>
                     </property>
@@ -509,7 +518,7 @@
                      <double>10.000000000000000</double>
                     </property>
                     <property name="value">
-                     <double>0.000000000000000</double>
+                     <double>10.000000000000000</double>
                     </property>
                    </widget>
                   </item>

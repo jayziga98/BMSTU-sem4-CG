@@ -208,7 +208,7 @@ void MainWindow::on_pushButton_grad_clicked()
     for (int curType = 0; curType < categories.length(); curType++)
         chart->addSeries(sets[curType]);
 
-    chart->setTitle("Ступенчатость отрезков");
+    chart->setTitle(QString("Ступенчатость отрезков (длина = %1)").arg(len));
     chart->setAnimationOptions(QChart::SeriesAnimations);
     chart->createDefaultAxes();
 
