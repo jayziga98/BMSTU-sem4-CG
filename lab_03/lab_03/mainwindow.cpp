@@ -135,7 +135,7 @@ void MainWindow::on_pushButton_time_clicked()
             sum += ms_double.count();
         }
 
-        sum /= 10;
+        sum /= 10.0;
 
 
         qDebug() << sum;
