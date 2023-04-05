@@ -102,7 +102,7 @@ void MainWindow::on_pushButton_spectrum_clicked()
 
 void MainWindow::on_pushButton_time_clicked()
 {
-    qreal len = 10000;
+    qreal len = 1000;
 
     QStringList categories;
     categories << "ЦДА" << "Брезенхэм (вещественные)" << "Брезенхэм (целые)" << "Брезенхэм (устранение ступенчатости)" << "Ву" << "Библиотечная";
@@ -121,18 +121,27 @@ void MainWindow::on_pushButton_time_clicked()
         params.color = Qt::black;
         params.type = algoType(curType);
 
+        double sum = 0;
+        for (int k = 0; k < 10; k++)
+        {
+            auto t1 = std::chrono::high_resolution_clock::now();
+            QGraphicsItem *item = line(qline, params, nullptr);
+            ui->graphicsView->scene()->addItem(item);
+            auto t2 = std::chrono::high_resolution_clock::now();
+            ui->graphicsView->scene()->removeItem(item);
 
-        auto t1 = std::chrono::high_resolution_clock::now();
-        QGraphicsItem *item = line(qline, params, nullptr);
-        ui->graphicsView->scene()->addItem(item);
-        auto t2 = std::chrono::high_resolution_clock::now();
-        ui->graphicsView->scene()->removeItem(item);
+            std::chrono::duration<double, std::milli> ms_double = t2 - t1;
 
-        std::chrono::duration<double, std::milli> ms_double = t2 - t1;
+            sum += ms_double.count();
+        }
+
+        sum /= 10;
 
 
-        sets[curType]->append(ms_double.count());
+        qDebug() << sum;
+        sets[curType]->append(sum);
     }
+//    ui->graphicsView->scene()->clear();
 
     QBarSeries *series = new QBarSeries();
     series->append(sets);
