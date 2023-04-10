@@ -66,11 +66,11 @@
           </font>
          </property>
          <property name="currentIndex">
-          <number>1</number>
+          <number>0</number>
          </property>
          <widget class="QWidget" name="tab">
           <attribute name="title">
-           <string>Отрезок</string>
+           <string>Эллипс</string>
           </attribute>
           <layout class="QGridLayout" name="gridLayout_9">
            <item row="0" column="0">
@@ -108,19 +108,6 @@
               <item row="2" column="0">
                <layout class="QGridLayout" name="gridLayout_4">
                 <item row="0" column="0">
-                 <widget class="QLabel" name="label_7">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
-                  <property name="text">
-                   <string>Вторая точка</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="1" column="0">
                  <layout class="QHBoxLayout" name="horizontalLayout_3">
                   <item>
                    <widget class="QLabel" name="label_8">
@@ -131,12 +118,12 @@
                      </sizepolicy>
                     </property>
                     <property name="text">
-                     <string>X</string>
+                     <string>Высота</string>
                     </property>
                    </widget>
                   </item>
                   <item>
-                   <widget class="QDoubleSpinBox" name="line_x2">
+                   <widget class="QDoubleSpinBox" name="circle_height">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                       <horstretch>0</horstretch>
@@ -169,12 +156,12 @@
                      </sizepolicy>
                     </property>
                     <property name="text">
-                     <string>Y</string>
+                     <string>Ширина</string>
                     </property>
                    </widget>
                   </item>
                   <item>
-                   <widget class="QDoubleSpinBox" name="line_y2">
+                   <widget class="QDoubleSpinBox" name="circle_width">
                     <property name="cursor">
                      <cursorShape>PointingHandCursor</cursorShape>
                     </property>
@@ -214,7 +201,7 @@
                    </sizepolicy>
                   </property>
                   <property name="text">
-                   <string>Первая точка</string>
+                   <string>Левая нижня точка</string>
                   </property>
                  </widget>
                 </item>
@@ -234,7 +221,7 @@
                    </widget>
                   </item>
                   <item>
-                   <widget class="QDoubleSpinBox" name="line_x1">
+                   <widget class="QDoubleSpinBox" name="circle_x">
                     <property name="cursor">
                      <cursorShape>PointingHandCursor</cursorShape>
                     </property>
@@ -266,7 +253,7 @@
                    </widget>
                   </item>
                   <item>
-                   <widget class="QDoubleSpinBox" name="line_y1">
+                   <widget class="QDoubleSpinBox" name="circle_y">
                     <property name="cursor">
                      <cursorShape>PointingHandCursor</cursorShape>
                     </property>
@@ -289,7 +276,7 @@
                </layout>
               </item>
               <item row="4" column="0">
-               <widget class="QPushButton" name="pushButton_line">
+               <widget class="QPushButton" name="pushButton_circle">
                 <property name="cursor">
                  <cursorShape>PointingHandCursor</cursorShape>
                 </property>
@@ -341,61 +328,8 @@
               <property name="bottomMargin">
                <number>0</number>
               </property>
-              <item row="1" column="0">
-               <widget class="Line" name="line_2">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-               </widget>
-              </item>
-              <item row="4" column="0">
-               <layout class="QHBoxLayout" name="horizontalLayout_5">
-                <item>
-                 <widget class="QLabel" name="label_14">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
-                  <property name="text">
-                   <string>Угол °</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QDoubleSpinBox" name="spectrum_angle">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
-                  <property name="decimals">
-                   <number>3</number>
-                  </property>
-                  <property name="minimum">
-                   <double>0.500000000000000</double>
-                  </property>
-                  <property name="maximum">
-                   <double>359.000000000000000</double>
-                  </property>
-                  <property name="singleStep">
-                   <double>15.000000000000000</double>
-                  </property>
-                  <property name="value">
-                   <double>1.000000000000000</double>
-                  </property>
-                 </widget>
-                </item>
-               </layout>
-              </item>
               <item row="3" column="0">
-               <widget class="Line" name="line">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-               </widget>
+               <layout class="QGridLayout" name="gridLayout_6"/>
               </item>
               <item row="0" column="0">
                <layout class="QGridLayout" name="gridLayout_7">
@@ -476,7 +410,21 @@
                 </item>
                </layout>
               </item>
+              <item row="1" column="0">
+               <widget class="Line" name="line_2">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+               </widget>
+              </item>
               <item row="6" column="0">
+               <widget class="Line" name="line_5">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+               </widget>
+              </item>
+              <item row="7" column="0">
                <widget class="QPushButton" name="pushButton_spectrum">
                 <property name="cursor">
                  <cursorShape>PointingHandCursor</cursorShape>
@@ -487,50 +435,207 @@
                </widget>
               </item>
               <item row="2" column="0">
-               <layout class="QGridLayout" name="gridLayout_6">
-                <item row="0" column="0">
-                 <layout class="QHBoxLayout" name="horizontalLayout_4">
-                  <item>
-                   <widget class="QLabel" name="label_11">
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
-                    </property>
-                    <property name="text">
-                     <string>Длина</string>
-                    </property>
-                   </widget>
+               <widget class="QTabWidget" name="tabWidget_2">
+                <property name="currentIndex">
+                 <number>1</number>
+                </property>
+                <widget class="QWidget" name="tab_3">
+                 <attribute name="title">
+                  <string>Радиусы</string>
+                 </attribute>
+                 <widget class="QWidget" name="">
+                  <property name="geometry">
+                   <rect>
+                    <x>20</x>
+                    <y>12</y>
+                    <width>287</width>
+                    <height>21</height>
+                   </rect>
+                  </property>
+                  <layout class="QHBoxLayout" name="horizontalLayout_4">
+                   <item>
+                    <widget class="QLabel" name="label_11">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="text">
+                      <string>R начальный</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QDoubleSpinBox" name="spectrum_len">
+                     <property name="decimals">
+                      <number>4</number>
+                     </property>
+                     <property name="minimum">
+                      <double>5.000000000000000</double>
+                     </property>
+                     <property name="maximum">
+                      <double>9999.000000000000000</double>
+                     </property>
+                     <property name="singleStep">
+                      <double>10.000000000000000</double>
+                     </property>
+                     <property name="value">
+                      <double>10.000000000000000</double>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </widget>
+                 <widget class="Line" name="line">
+                  <property name="geometry">
+                   <rect>
+                    <x>20</x>
+                    <y>44</y>
+                    <width>287</width>
+                    <height>16</height>
+                   </rect>
+                  </property>
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                 </widget>
+                 <widget class="QWidget" name="">
+                  <property name="geometry">
+                   <rect>
+                    <x>20</x>
+                    <y>58</y>
+                    <width>287</width>
+                    <height>21</height>
+                   </rect>
+                  </property>
+                  <layout class="QHBoxLayout" name="horizontalLayout_5">
+                   <item>
+                    <widget class="QLabel" name="label_14">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="text">
+                      <string>R конечный</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QDoubleSpinBox" name="spectrum_angle">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="decimals">
+                      <number>3</number>
+                     </property>
+                     <property name="minimum">
+                      <double>0.500000000000000</double>
+                     </property>
+                     <property name="maximum">
+                      <double>359.000000000000000</double>
+                     </property>
+                     <property name="singleStep">
+                      <double>15.000000000000000</double>
+                     </property>
+                     <property name="value">
+                      <double>1.000000000000000</double>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </widget>
+                </widget>
+                <widget class="QWidget" name="tab_4">
+                 <attribute name="title">
+                  <string>Шаг, диаметр</string>
+                 </attribute>
+                 <layout class="QGridLayout" name="gridLayout_14">
+                  <item row="0" column="0">
+                   <layout class="QHBoxLayout" name="horizontalLayout_10">
+                    <item>
+                     <widget class="QLabel" name="label_12">
+                      <property name="sizePolicy">
+                       <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+                        <horstretch>0</horstretch>
+                        <verstretch>0</verstretch>
+                       </sizepolicy>
+                      </property>
+                      <property name="text">
+                       <string>Шаг</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QDoubleSpinBox" name="spectrum_len_2">
+                      <property name="decimals">
+                       <number>4</number>
+                      </property>
+                      <property name="minimum">
+                       <double>5.000000000000000</double>
+                      </property>
+                      <property name="maximum">
+                       <double>9999.000000000000000</double>
+                      </property>
+                      <property name="singleStep">
+                       <double>10.000000000000000</double>
+                      </property>
+                      <property name="value">
+                       <double>10.000000000000000</double>
+                      </property>
+                     </widget>
+                    </item>
+                   </layout>
                   </item>
-                  <item>
-                   <widget class="QDoubleSpinBox" name="spectrum_len">
-                    <property name="decimals">
-                     <number>4</number>
-                    </property>
-                    <property name="minimum">
-                     <double>5.000000000000000</double>
-                    </property>
-                    <property name="maximum">
-                     <double>9999.000000000000000</double>
-                    </property>
-                    <property name="singleStep">
-                     <double>10.000000000000000</double>
-                    </property>
-                    <property name="value">
-                     <double>10.000000000000000</double>
-                    </property>
-                   </widget>
+                  <item row="1" column="0">
+                   <layout class="QHBoxLayout" name="horizontalLayout_11">
+                    <item>
+                     <widget class="QLabel" name="label_16">
+                      <property name="sizePolicy">
+                       <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+                        <horstretch>0</horstretch>
+                        <verstretch>0</verstretch>
+                       </sizepolicy>
+                      </property>
+                      <property name="text">
+                       <string>Диаметр</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QDoubleSpinBox" name="spectrum_angle_2">
+                      <property name="sizePolicy">
+                       <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                        <horstretch>0</horstretch>
+                        <verstretch>0</verstretch>
+                       </sizepolicy>
+                      </property>
+                      <property name="decimals">
+                       <number>3</number>
+                      </property>
+                      <property name="minimum">
+                       <double>0.500000000000000</double>
+                      </property>
+                      <property name="maximum">
+                       <double>359.000000000000000</double>
+                      </property>
+                      <property name="singleStep">
+                       <double>15.000000000000000</double>
+                      </property>
+                      <property name="value">
+                       <double>1.000000000000000</double>
+                      </property>
+                     </widget>
+                    </item>
+                   </layout>
                   </item>
                  </layout>
-                </item>
-               </layout>
-              </item>
-              <item row="5" column="0">
-               <widget class="Line" name="line_5">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
+                </widget>
                </widget>
               </item>
              </layout>
@@ -682,27 +787,22 @@ border: none;
             </property>
             <item>
              <property name="text">
-              <string>Цифровой дифференциальный анализатор</string>
+              <string>Каноническое уравнение</string>
              </property>
             </item>
             <item>
              <property name="text">
-              <string>Брезенхэм (вещественные)</string>
+              <string>Параметрическое уравнение</string>
              </property>
             </item>
             <item>
              <property name="text">
-              <string>Брезенхэм (целые)</string>
+              <string>Брезенхэм</string>
              </property>
             </item>
             <item>
              <property name="text">
-              <string>Брезенхэм (с утранением ступенчатости)</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>Ву</string>
+              <string>Средняя точка</string>
              </property>
             </item>
             <item>
@@ -772,7 +872,7 @@ border: none;
      <x>0</x>
      <y>0</y>
      <width>1123</width>
-     <height>24</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuEdit">

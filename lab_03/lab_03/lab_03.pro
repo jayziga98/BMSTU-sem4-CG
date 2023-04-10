@@ -12,17 +12,15 @@ INCLUDEPATH += $$PWD/Users/toupist/Downloads/Qt-Advanced-Stylesheets-main/src
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    line.cpp \
+    circle.cpp \
     main.cpp \
     mainwindow.cpp \
-    spectrum.cpp \
     stask.cpp \
     staskpool.cpp
 
 HEADERS += \
-    line.h \
+    circle.h \
     mainwindow.h \
-    spectrum.h \
     stask.h \
     staskpool.h
 

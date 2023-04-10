@@ -3,7 +3,6 @@
 
 #include <QMainWindow>
 #include "staskpool.h"
-#include "line.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -18,10 +17,10 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(STaskPool *pool, QWidget *parent = nullptr);
     ~MainWindow();
-    algoType curAlgorithm();
+    int curAlgorithmInd();
 
 private slots:
-    void on_pushButton_line_clicked();
+    void on_pushButton_circle_clicked();
 
     void on_pushButton_pen_clicked();
 
