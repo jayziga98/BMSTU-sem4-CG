@@ -13,14 +13,19 @@ INCLUDEPATH += $$PWD/Users/toupist/Downloads/Qt-Advanced-Stylesheets-main/src
 
 SOURCES += \
     circle.cpp \
+    ellipse.cpp \
     main.cpp \
     mainwindow.cpp \
+    pixel.cpp \
     stask.cpp \
     staskpool.cpp
 
 HEADERS += \
+    algoTypes.h \
     circle.h \
+    ellipse.h \
     mainwindow.h \
+    pixel.h \
     stask.h \
     staskpool.h
 
