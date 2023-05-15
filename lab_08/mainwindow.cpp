@@ -14,6 +14,8 @@ MainWindow::MainWindow(QWidget *parent) :
     pixmap = QPixmap(ui->drawLabel->width(), ui->drawLabel->height());
     ui->drawLabel->setPixmapPointer(pixmap);
 
+    setWindowTitle("Лабораторная работа №8");
+
     on_clearAllPushButton_clicked();
 }
 
