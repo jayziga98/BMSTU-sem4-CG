@@ -19,15 +19,17 @@ public:
     ~MainWindow();
 
 private slots:
-    void on_addLinePushButton_clicked();
+    void on_addPolygonVertexPushButton_clicked();
     void on_addClipperVertexPushButton_clicked();
-    void on_setLineColorPushButton_clicked();
+    void on_setPolygonColorPushButton_clicked();
     void on_setClipperColorPushButton_clicked();
     void on_setClippedLineColorPushButton_clicked();
-    void on_clipPushButton_clicked();
-    void on_clearAllPushButton_clicked();
+    void on_closePolygonPushButton_clicked();
     void on_closeClipperPushButton_clicked();
+    void on_clipPushButton_clicked();
+    void on_deletePolygonPushButton_clicked();
     void on_deleteClipperPushButton_clicked();
+    void on_clearAllPushButton_clicked();
     void resizeEvent(QResizeEvent* event);
 
 protected:
@@ -40,21 +42,28 @@ private:
     QPixmap pixmap;
     void displayImage();
 
-    QColor lineColor;
+    QColor polygonColor;
     QColor clipperColor;
     QColor clippedLineColor;
-    void setLineColor(const QColor &color);
-    void setClipperColor(const QColor &color);
-    void setClippedLineColor(const QColor &color);
-    void colorLabel(const QColor &color, QLabel *label);
+    void setColor(QColor &color, const QString &msg, QLabel *label);
+    void setPolygonColor(QColor color);
+    void setClipperColor(QColor color);
+    void setClippedLineColor(QColor color);
+    void colorLabel(QColor color, QLabel *label);
 
-    QVector<QLine> lines;
-    QVector<QPoint> clipper_vertices;
-    bool left_clicked;
-    bool closed;
-    void addLine(const QLine &line);
+    QVector<QPoint> polygonVertices;
+    QVector<QPoint> clipperVertices;
+    bool polygonClosed;
+    bool clipperClosed;
+    void addFigureVertex(QVector<QPoint> &figure_vertices, bool &figure_closed, const QPoint& vertex);
+    void closeFigure(int figure_vertices_size, bool &figure_closed);
+    void deleteFigure(QVector<QPoint> &figure_vertices, bool &figure_closed);
+
     int checkClipper();
-    void clipLine(const QLine &line, int direction, const QVector<QLine> &edges, QPainter &painter);
+    QVector<QPoint> clipPolygon(int direction);
+    bool checkIntersection(const QPoint &sp, const QPoint &ep, const QPoint &p0, const QPoint &p1);
+    int isVisible(const QPoint &p, const QPoint &p1, const QPoint &p2);
+    QPoint intersection(QPoint &p1, QPoint &p2, QPoint &cp1, QPoint &cp2);
 };
 
 #endif // MAINWINDOW_H

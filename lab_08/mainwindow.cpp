@@ -14,8 +14,6 @@ MainWindow::MainWindow(QWidget *parent) :
     pixmap = QPixmap(ui->drawLabel->width(), ui->drawLabel->height());
     ui->drawLabel->setPixmapPointer(pixmap);
 
-    setWindowTitle("Лабораторная работа №8");
-
     on_clearAllPushButton_clicked();
 }
 
@@ -24,45 +22,45 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::on_addLinePushButton_clicked()
+void MainWindow::on_addPolygonVertexPushButton_clicked()
 {
-    const int x1 = ui->x1SpinBox->value();
-    const int y1 = ui->y1SpinBox->value();
-    const int x2 = ui->x2SpinBox->value();
-    const int y2 = ui->y2SpinBox->value();
+    const int x = ui->xPolygonSpinBox->value();
+    const int y = ui->yPolygonSpinBox->value();
 
-    addLine(QLine(x1, y1, x2, y2));
-
+    addFigureVertex(polygonVertices, polygonClosed, QPoint(x, y));
 }
 
 void MainWindow::on_addClipperVertexPushButton_clicked()
 {
-    const int x = ui->xSpinBox->value();
-    const int y = ui->ySpinBox->value();
+    const int x = ui->xClipperSpinBox->value();
+    const int y = ui->yClipperSpinBox->value();
 
-    if (closed)
-        on_deleteClipperPushButton_clicked();
-
-    clipper_vertices.push_back(QPoint(x, y));
-    displayImage();
+    addFigureVertex(clipperVertices, clipperClosed, QPoint(x, y));
 }
 
-void MainWindow::on_setLineColorPushButton_clicked()
+void MainWindow::on_setPolygonColorPushButton_clicked()
 {
-    setLineColor(QColorDialog::getColor(lineColor, this, "Выберите цвет отрезка", QColorDialog::DontUseNativeDialog));
-    displayImage();
+    setColor(polygonColor, "Выберите цвет многоугольника", ui->polygonColorLabel);
 }
 
 void MainWindow::on_setClipperColorPushButton_clicked()
 {
-    setClipperColor(QColorDialog::getColor(clipperColor, this, "Выберите цвет отсекателя", QColorDialog::DontUseNativeDialog));
-    displayImage();
+    setColor(clipperColor, "Выберите цвет отсекателя", ui->clipperColorLabel);
 }
 
 void MainWindow::on_setClippedLineColorPushButton_clicked()
 {
-    setClippedLineColor(QColorDialog::getColor(clippedLineColor, this, "Выберите цвет отсечённого отрезка", QColorDialog::DontUseNativeDialog));
-    displayImage();
+    setColor(clippedLineColor, "Выберите цвет отсечённой части", ui->clippedLineColorLabel);
+}
+
+void MainWindow::on_closePolygonPushButton_clicked()
+{
+    closeFigure(polygonVertices.size(), polygonClosed);
+}
+
+void MainWindow::on_closeClipperPushButton_clicked()
+{
+    closeFigure(clipperVertices.size(), clipperClosed);
 }
 
 QVector<QLine> verticesToEdges(const QVector<QPoint>& vertices)
@@ -78,66 +76,53 @@ QVector<QLine> verticesToEdges(const QVector<QPoint>& vertices)
 
 void MainWindow::on_clipPushButton_clicked()
 {
-    if (clipper_vertices.size() <= 2) {
-        QMessageBox::critical(this, "Ошибка", "Необходимо по крайней мере 2 грани");
+    if (!polygonClosed) {
+        QMessageBox::critical(this, "Ошибка", "Многоугольник должен быть замкнут!");
+        return;
+    }
+
+    if (!clipperClosed) {
+        QMessageBox::critical(this, "Ошибка", "Отсекатель должен быть замкнут");
         return;
     }
 
     int direction = checkClipper();
     if (!direction) {
-        QMessageBox::critical(nullptr, "Ошибка", "Отсекатель должен быть выпуклым");
+        QMessageBox::critical(this, "Ошибка", "Отсекатель должен быть выпуклым");
         return;
     }
-
-    if (!closed) {
-        QMessageBox::critical(nullptr, "Ошибка", "Отсекатель должен быть замкнутым");
-        return;
-    }
-
-    auto edges = verticesToEdges(clipper_vertices);
 
     QPainter painter(&pixmap);
     painter.setPen(QPen(clippedLineColor, 3));
+    auto clipped = clipPolygon(direction);
 
-    for (const auto &line: lines)
-        clipLine(line, direction, edges, painter);
+    for (int i = 1; i < clipped.size(); ++i)
+        painter.drawLine(clipped[i - 1], clipped[i]);
+
+    if (clipped.size() > 1)
+        painter.drawLine(clipped.back(), clipped.front());
 
     ui->drawLabel->update();
 }
 
-void MainWindow::on_clearAllPushButton_clicked()
+void MainWindow::on_deletePolygonPushButton_clicked()
 {
-    lines.clear();
-    on_deleteClipperPushButton_clicked();
-
-    setLineColor(Qt::red);
-    setClipperColor(Qt::black);
-    setClippedLineColor(Qt::blue);
-
-    left_clicked = false;
-}
-
-void MainWindow::on_closeClipperPushButton_clicked()
-{
-    if (closed) {
-        QMessageBox::critical(this, "Ошибка", "Отсекатель уже замкнут");
-        return;
-    }
-
-    if (clipper_vertices.size() <= 2) {
-        QMessageBox::critical(this, "Ошибка", "Необходимо по крайней мере 2 грани");
-        return;
-    }
-
-    closed = true;
-    displayImage();
+    deleteFigure(polygonVertices, polygonClosed);
 }
 
 void MainWindow::on_deleteClipperPushButton_clicked()
 {
-    clipper_vertices.clear();
-    closed = false;
-    displayImage();
+    deleteFigure(clipperVertices, clipperClosed);
+}
+
+void MainWindow::on_clearAllPushButton_clicked()
+{
+    on_deletePolygonPushButton_clicked();
+    on_deleteClipperPushButton_clicked();
+
+    setPolygonColor(Qt::red);
+    setClipperColor(Qt::black);
+    setClippedLineColor(Qt::blue);
 }
 
 void MainWindow::mousePressEvent(QMouseEvent *event)
@@ -150,28 +135,23 @@ void MainWindow::mousePressEvent(QMouseEvent *event)
 
     switch (event->button()) {
     case Qt::LeftButton:
-        if (left_clicked) {
-            const int x1 = ui->x1SpinBox->value();
-            const int y1 = ui->y1SpinBox->value();
+        if (!polygonVertices.empty()) {
+            const int x1 = ui->xPolygonSpinBox->value();
+            const int y1 = ui->yPolygonSpinBox->value();
             receiveKeyboardModifiers(x, y, x1, y1);
-            ui->x2SpinBox->setValue(x);
-            ui->y2SpinBox->setValue(y);
-            on_addLinePushButton_clicked();
         }
-        else {
-            ui->x1SpinBox->setValue(x);
-            ui->y1SpinBox->setValue(y);
-            left_clicked = true;
-        }
+        ui->xPolygonSpinBox->setValue(x);
+        ui->yPolygonSpinBox->setValue(y);
+        on_addPolygonVertexPushButton_clicked();
         break;
     case Qt::RightButton:
-        if (!clipper_vertices.empty()) {
-            const int x1 = ui->xSpinBox->value();
-            const int y1 = ui->ySpinBox->value();
+        if (!clipperVertices.empty()) {
+            const int x1 = ui->xClipperSpinBox->value();
+            const int y1 = ui->yClipperSpinBox->value();
             receiveKeyboardModifiers(x, y, x1, y1);
         }
-        ui->xSpinBox->setValue(x);
-        ui->ySpinBox->setValue(y);
+        ui->xClipperSpinBox->setValue(x);
+        ui->yClipperSpinBox->setValue(y);
         on_addClipperVertexPushButton_clicked();
         break;
     default:
@@ -216,50 +196,82 @@ void MainWindow::displayImage()
 
     QPainter painter(&pixmap);
 
-    painter.setPen(QPen(clipperColor, 3));
-    for (int i = 1; i < clipper_vertices.size(); ++i)
-        painter.drawLine(clipper_vertices[i - 1], clipper_vertices[i]);
-    if (closed)
-        painter.drawLine(clipper_vertices.back(), clipper_vertices.front());
+    painter.setPen(clipperColor);
+    for (int i = 1; i < clipperVertices.size(); ++i)
+        painter.drawLine(clipperVertices[i - 1], clipperVertices[i]);
+    if (clipperClosed && clipperVertices.size())
+        painter.drawLine(clipperVertices.back(), clipperVertices.front());
 
-    painter.setPen(lineColor);
-    for (const auto &line: lines)
-        painter.drawLine(line);
+    painter.setPen(polygonColor);
+    for (int i = 1; i < polygonVertices.size(); ++i)
+        painter.drawLine(polygonVertices[i - 1], polygonVertices[i]);
+    if (polygonClosed && polygonVertices.size())
+        painter.drawLine(polygonVertices.back(), polygonVertices.front());
 
     ui->drawLabel->update();
 }
 
-void MainWindow::setLineColor(const QColor &color)
+void MainWindow::setColor(QColor &color, const QString &msg, QLabel *label)
 {
-    lineColor = color;
-    colorLabel(lineColor, ui->lineColorLabel);
+    color = QColorDialog::getColor(clipperColor, this, msg, QColorDialog::DontUseNativeDialog);
+    colorLabel(color, label);
+    displayImage();
 }
 
-void MainWindow::setClipperColor(const QColor &color)
+void MainWindow::setPolygonColor(QColor color)
+{
+    polygonColor = color;
+    colorLabel(polygonColor, ui->polygonColorLabel);
+}
+
+void MainWindow::setClipperColor(QColor color)
 {
     clipperColor = color;
     colorLabel(clipperColor, ui->clipperColorLabel);
 }
 
-void MainWindow::setClippedLineColor(const QColor &color)
+void MainWindow::setClippedLineColor(QColor color)
 {
     clippedLineColor = color;
     colorLabel(clippedLineColor, ui->clippedLineColorLabel);
 }
 
-void MainWindow::colorLabel(const QColor &color, QLabel *label) {
+void MainWindow::colorLabel(QColor color, QLabel *label) {
     QPalette palette = label->palette();
     palette.setColor(label->backgroundRole(), color);
     label->setAutoFillBackground(true);
     label->setPalette(palette);
 }
 
-void MainWindow::addLine(const QLine &line)
+void MainWindow::addFigureVertex(QVector<QPoint> &figure_vertices, bool &figure_closed, const QPoint &vertex)
 {
-    if (lines.contains(line))
-        closed = true;
-    lines.push_back(line);
-    left_clicked = false;
+    if (figure_closed)
+        deleteFigure(figure_vertices, figure_closed);
+
+    figure_vertices.push_back(vertex);
+    displayImage();
+}
+
+void MainWindow::closeFigure(int figure_vertices_size, bool &figure_closed)
+{
+    if (figure_closed) {
+        QMessageBox::critical(this, "Ошибка", "Фигура уже замкнута");
+        return;
+    }
+
+    if (figure_vertices_size <= 2) {
+        QMessageBox::critical(this, "Ошибка", "Необходимо по крайней мере 2 ребра");
+        return;
+    }
+
+    figure_closed = true;
+    displayImage();
+}
+
+void MainWindow::deleteFigure(QVector<QPoint> &figure_vertices, bool &figure_closed)
+{
+    figure_vertices.clear();
+    figure_closed = false;
     displayImage();
 }
 
@@ -286,17 +298,17 @@ int MainWindow::checkClipper()
 {
     int f = 1;
 
-    QPoint prev_vertex = clipper_vertices.back();
-    QPoint curr_vertex = clipper_vertices[0];
-    QPoint next_vertex = clipper_vertices[1];
+    QPoint prev_vertex = clipperVertices.back();
+    QPoint curr_vertex = clipperVertices[0];
+    QPoint next_vertex = clipperVertices[1];
 
     int prev_direction = direction(prev_vertex, curr_vertex, next_vertex);
     int curr_direction = 0;
 
-    for (int i = 1; i < clipper_vertices.size() && f; ++i) {
+    for (int i = 1; i < clipperVertices.size() && f; ++i) {
         prev_vertex = curr_vertex;
         curr_vertex = next_vertex;
-        next_vertex = clipper_vertices[(i + 1) % clipper_vertices.size()];
+        next_vertex = clipperVertices[(i + 1) % clipperVertices.size()];
 
         curr_direction = direction(prev_vertex, curr_vertex, next_vertex);
 
@@ -309,47 +321,53 @@ int MainWindow::checkClipper()
     return f * curr_direction;
 }
 
-double dotProduct(const QPointF &a, const QPointF &b)
+QVector<QPoint> MainWindow::clipPolygon(int direction)
 {
-    return a.x() * b.x() + a.y() * b.y();
-}
+    QVector<QPoint> result;
+    QVector<QPoint> polygon = polygonVertices;
+    QVector<QPoint> clipper = clipperVertices;
+    clipper.push_back(clipper.front());
 
-QPointF perpendicular(const QPointF &point)
-{
-    return {-point.y(), point.x()};
-}
+    QPoint first, start;
 
-void MainWindow::clipLine(const QLine &line, int direction, const QVector<QLine> &edges, QPainter &painter) {
-    QPoint d = line.p2() - line.p1();
-    float tb = 0;
-    float te = 1;
+    for (int i = 0; i < clipper.size() - 1; ++i) {
+        for (int j = 0; j < polygon.size(); ++j) {
+            if (!j)
+                first = polygon[j];
+            else if (checkIntersection(start, polygon[j], clipper[i], clipper[i + 1]))
+                result.push_back(intersection(start, polygon[j], clipper[i], clipper[i + 1]));
 
-    for (const auto& edge: edges) {
-        QPoint w = line.p1() - edge.p1();
-        QPointF n = perpendicular(direction * (edge.p2() - edge.p1()));
-
-        auto d_scalar = dotProduct(d, n);
-        auto w_scalar = dotProduct(w, n);
-
-        if (d_scalar == 0.0) { // (p2 == p1)  or  (D || n)
-            if (w_scalar < 0)
-                return; // line is invisible
-        } else {
-            float t = -w_scalar / d_scalar;
-            if (d_scalar > 0) {
-                if (t > 1)
-                    return;
-                tb = qMax(tb, t);
-            } else {
-                if (t < 0)
-                    return;
-                te = qMin(te, t);
-            }
+            start = polygon[j];
+            if (isVisible(start, clipper[i], clipper[i + 1]) * direction < 0)
+                result.push_back(start);
         }
+
+        if (!result.empty()) {
+            if (checkIntersection(start, first, clipper[i], clipper[i + 1]))
+                result.push_back(intersection(start, first, clipper[i], clipper[i + 1]));
+        }
+
+        polygon = result;
+        result.clear();
     }
 
-    if (tb <= te)
-        painter.drawLine(line.p1() + d * te, line.p1() + d * tb);
+    return polygon;
+}
+
+bool MainWindow::checkIntersection(const QPoint &sp, const QPoint &ep, const QPoint &p0, const QPoint &p1)
+{
+    return isVisible(sp, p0, p1) * isVisible(ep, p0, p1) <= 0;
+}
+
+int MainWindow::isVisible(const QPoint &p, const QPoint &p1, const QPoint &p2)
+{
+    return sign(skewProduct(p - p1, p2 - p1));
+}
+
+QPoint MainWindow::intersection(QPoint &p1, QPoint &p2, QPoint &cp1, QPoint &cp2) {
+    const int det = skewProduct(p2 - p1, cp1 - cp2);
+    const double t = static_cast<double>(skewProduct(cp1 - p1, cp1 - cp2)) / det;
+    return p1 + (p2 - p1) * t;
 }
 
 void MainWindow::resizeEvent(QResizeEvent* event)
