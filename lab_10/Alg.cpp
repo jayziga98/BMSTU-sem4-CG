@@ -1,4 +1,6 @@
 #include "Alg.h"
+#include "QtWidgets/qgraphicsscene.h"
+#include <qDebug>
 
 #define INVISIBLE 0
 #define UPPER_TOP 1
@@ -58,7 +60,7 @@ void transform(double x, double y, double z, transform_data t_data, int &res_x, 
 
 void horizone(int x1, int y1, int x2, int y2, QVector<int> &top, QVector<int> &bottom, QGraphicsScene *scene)
 {
-    if (x2 == x1)
+    if (x2 == x1 && x2 >= 0 && top.size() > x2 && bottom.size() > x2)
     {
         top[x2] = qMax(top[x2], y2);
         bottom[x2] = qMin(bottom[x2], y2);
@@ -70,16 +72,18 @@ void horizone(int x1, int y1, int x2, int y2, QVector<int> &top, QVector<int> &b
         double m = double(y2 - y1) / double(x2 - x1);
         for (int x = x1; x <= x2; ++x)
         {
-            int y = qRound(m * (x - x1) + y1);
-            top[x] = qMax(top[x], y);
-            bottom[x] = qMin(bottom[x], y);
-            scene->addLine(tmp_x, tmp_y, x, y);
+            if (x >= 0 && top.size() > x && bottom.size() > x)
+            {
+                int y = qRound(m * (x - x1) + y1);
+                top[x] = qMax(top[x], y);
+                bottom[x] = qMin(bottom[x], y);
+                scene->addLine(tmp_x, tmp_y, x, y);
+            }
         }
     }
 }
 
-void
-process_edge(int x, int y, int &x_edge, int &y_edge, QVector<int> &top, QVector<int> &bottom, QGraphicsScene *scene)
+void process_edge(int x, int y, int &x_edge, int &y_edge, QVector<int> &top, QVector<int> &bottom, QGraphicsScene *scene)
 {
     if (x_edge != -1)
         horizone(x_edge, y_edge, x, y, top, bottom, scene);
@@ -89,34 +93,40 @@ process_edge(int x, int y, int &x_edge, int &y_edge, QVector<int> &top, QVector<
 
 int visible(int x, int y, QVector<int> &top, QVector<int> &bottom)
 {
-    int tmp1 = top[x], tmp2 = bottom[x];
-    if (y >= top[x])
-        return 1;
-    if (y <= bottom[x])
-        return -1;
+    if (x >= 0 && top.size() > x && bottom.size() > x)
+    {
+        int tmp1 = top[x], tmp2 = bottom[x];
+        if (y >= top[x])
+            return 1;
+        if (y <= bottom[x])
+            return -1;
+    }
     return 0;
 }
 
 void intersect(int x1, int y1, int x2, int y2, QVector<int> &horizon, int &xi, int &yi)
 {
-    int h1 = horizon[x1], h2 = horizon[x2];
-    int dx = x2 - x1, dy = y2 - y1, dh = h2 - h1;
+    if (x1 >= 0 && x2 >= 0 && horizon.size() > x1 && horizon.size() > x2)
+    {
+        int h1 = horizon[x1], h2 = horizon[x2];
+        int dx = x2 - x1, dy = y2 - y1, dh = h2 - h1;
 
-    if (dx == 0)
-    {
-        xi = x2;
-        yi = h2;
-    }
-//    else if (y1 == h1 && y2 == h2)
-//    {
-//        xi = x1;
-//        yi = y1;
-//    }
-    else
-    {
-        double m = double(dy) / double(dx);
-        xi = x1 - qRound(double(dx * (y1 - h1)) / (dy - dh));
-        yi = qRound((xi - x1) * m + y1);
+        if (dx == 0)
+        {
+            xi = x2;
+            yi = h2;
+        }
+    //    else if (y1 == h1 && y2 == h2)
+    //    {
+    //        xi = x1;
+    //        yi = y1;
+    //    }
+        else
+        {
+            double m = double(dy) / double(dx);
+            xi = x1 - qRound(double(dx * (y1 - h1)) / (dy - dh));
+            yi = qRound((xi - x1) * m + y1);
+        }
     }
 }
 

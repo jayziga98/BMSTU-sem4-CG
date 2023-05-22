@@ -1,8 +1,8 @@
 #ifndef ALG_H
 #define ALG_H
 
-#include <QGraphicsScene>
 #include <QVector>
+#include <QGraphicsScene>
 #include <QRect>
 
 #include "funcs.h"
